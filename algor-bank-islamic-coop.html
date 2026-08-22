@@ -269,6 +269,8 @@
     <button class="gui-tab" data-tab="finance">FINANCE</button>
     <button class="gui-tab" data-tab="tx">TRANSACTIONS</button>
     <button class="gui-tab" data-tab="report">REPORTS</button>
+    <button class="gui-tab" data-tab="auth">AUTH</button>
+    <button class="gui-tab" data-tab="vault">VAULT</button>
   </div>
   <div class="gui-body">
     <div class="gui-panel active" id="gui-panel-dash">
@@ -400,6 +402,54 @@
       <button class="gui-btn" onclick="guiRefreshReport()">รีเฟรชรายงาน</button>
       <div id="gui-report" style="margin-top:12px;font-size:12px"></div>
     </div>
+    <div class="gui-panel" id="gui-panel-auth">
+      <div class="stat-box" id="auth-session-box" style="margin-bottom:14px">
+        <div class="lbl">SESSION</div>
+        <div class="val" id="auth-session-val" style="font-size:14px">GUEST</div>
+      </div>
+      <div class="gui-grid2">
+        <div>
+          <div class="gui-label">Username</div>
+          <input class="gui-input" id="auth-user" placeholder="admin" autocomplete="username">
+        </div>
+        <div>
+          <div class="gui-label">Password</div>
+          <input class="gui-input" id="auth-pass" type="password" placeholder="••••••••" autocomplete="current-password">
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">
+        <button class="gui-btn" onclick="guiLogin()">LOGIN</button>
+        <button class="gui-btn-sm" onclick="guiLogout()">LOGOUT</button>
+      </div>
+      <p id="auth-hint" style="margin-top:12px;color:var(--muted);font-size:12px">
+        Demo: admin / admin123 · teller / teller123 · viewer / view123
+      </p>
+      <div id="auth-users-list" style="margin-top:14px"></div>
+    </div>
+    <div class="gui-panel" id="gui-panel-vault">
+      <div class="stat-box" style="margin-bottom:14px">
+        <div class="lbl">VAULT STATUS</div>
+        <div class="val" id="vault-status-val" style="font-size:13px;font-weight:500">—</div>
+      </div>
+      <div class="gui-grid2">
+        <div>
+          <div class="gui-label">Vault password (SETPASS)</div>
+          <input class="gui-input" id="vault-pass" type="password" placeholder="min 6 characters">
+        </div>
+        <div style="display:flex;align-items:end;gap:8px;flex-wrap:wrap">
+          <button class="gui-btn" onclick="guiVaultSetPass()" style="margin-top:0">SET PASSWORD</button>
+          <button class="gui-btn-sm gui-btn-danger" onclick="guiVaultLock()">LOCK</button>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:14px">
+        <button class="gui-btn" onclick="guiVaultSave()">VAULT SAVE</button>
+        <button class="gui-btn" onclick="guiVaultLoad()">VAULT LOAD</button>
+      </div>
+      <p id="vault-hint" style="margin-top:12px;color:var(--muted);font-size:12px">
+        SAVE opens a system save dialog (Chrome/Edge). LOAD can be repeated anytime.
+      </p>
+      <div id="vault-msg" style="margin-top:10px;font-size:12px;color:var(--green)"></div>
+    </div>
   </div>
 </div>
 
@@ -415,7 +465,8 @@ let DB = {
   accounts: [],
   finances: [],
   transactions: [],
-  users: [], // OPS users {id, username, role, passHash hint - plain for offline demo}
+  users: [], // OPS users {id, username, role, passSalt, passHash} — no plaintext
+  audit: [], // {ts, user, role, action, detail}
   settings: {
     coopName: 'สหกรณ์อิสลาม ALGOR',
     currency: 'THB',
@@ -425,9 +476,10 @@ let DB = {
     nextFinanceId: 1,
     nextTxId: 1,
     vaultRemindMin: 30,
-    lastVaultSave: null
+    lastVaultSave: null,
+    vaultOnly: false // if true: do not write localStorage
   },
-  meta: { created: new Date().toISOString(), version: '1.0' }
+  meta: { created: new Date().toISOString(), version: '1.2' }
 };
 
 // Session (memory only)
@@ -435,6 +487,7 @@ let sessionUser = null; // {username, role: ADMIN|TELLER|VIEW}
 let vaultPassword = null;
 let editingMemberId = null;
 let vaultRemindTimer = null;
+let vaultOnlySession = false; // runtime override (MODE VAULT)
 
 // ── i18n ─────────────────────────────────────────────────
 const I18N = {
@@ -504,13 +557,14 @@ function loadDB() {
     }
   } catch (e) { console.warn(e); }
   ensureDBShape();
+  vaultOnlySession = !!DB.settings.vaultOnly;
 }
 function ensureDBShape() {
   if (!DB.settings) DB.settings = {};
   const def = {
     coopName: 'สหกรณ์อิสลาม ALGOR', currency: 'THB', lang: 'th',
     nextMemberId: 1, nextAccountId: 1, nextFinanceId: 1, nextTxId: 1,
-    vaultRemindMin: 30, lastVaultSave: null
+    vaultRemindMin: 30, lastVaultSave: null, vaultOnly: false
   };
   Object.keys(def).forEach(k => { if (DB.settings[k] === undefined) DB.settings[k] = def[k]; });
   if (!Array.isArray(DB.users)) DB.users = [];
@@ -518,15 +572,84 @@ function ensureDBShape() {
   if (!Array.isArray(DB.accounts)) DB.accounts = [];
   if (!Array.isArray(DB.finances)) DB.finances = [];
   if (!Array.isArray(DB.transactions)) DB.transactions = [];
-  // default admin if no users
+  if (!Array.isArray(DB.audit)) DB.audit = [];
+  // default admin if no users (plaintext temporarily — migrated to hash on boot)
   if (DB.users.length === 0) {
     DB.users.push({ id: 'U001', username: 'admin', password: 'admin123', role: 'ADMIN', name: 'System Admin' });
     DB.users.push({ id: 'U002', username: 'teller', password: 'teller123', role: 'TELLER', name: 'Counter Teller' });
     DB.users.push({ id: 'U003', username: 'viewer', password: 'view123', role: 'VIEW', name: 'Read Only' });
   }
 }
+function isVaultOnly() {
+  return vaultOnlySession || !!(DB.settings && DB.settings.vaultOnly);
+}
 function saveDB() {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(DB));
+  if (isVaultOnly()) {
+    // memory only — no localStorage write
+    return;
+  }
+  try {
+    // never persist accidental plaintext if still migrating
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(DB));
+  } catch (e) { console.warn(e); }
+}
+
+function audit(action, detail) {
+  if (!Array.isArray(DB.audit)) DB.audit = [];
+  DB.audit.push({
+    ts: new Date().toISOString(),
+    user: sessionUser ? sessionUser.username : 'GUEST',
+    role: sessionUser ? sessionUser.role : '-',
+    action: String(action || '').slice(0, 40),
+    detail: String(detail || '').slice(0, 200)
+  });
+  // keep last 500
+  if (DB.audit.length > 500) DB.audit = DB.audit.slice(-500);
+  saveDB();
+}
+
+// ── OPS password hashing (PBKDF2-SHA256, not plaintext) ──
+const OPS_PBKDF2_ITERS = 100000;
+async function hashPassword(password, saltBuf) {
+  const salt = saltBuf || crypto.getRandomValues(new Uint8Array(16));
+  const keyMaterial = await crypto.subtle.importKey(
+    'raw', new TextEncoder().encode(password), 'PBKDF2', false, ['deriveBits']
+  );
+  const bits = await crypto.subtle.deriveBits(
+    { name: 'PBKDF2', salt, iterations: OPS_PBKDF2_ITERS, hash: 'SHA-256' },
+    keyMaterial, 256
+  );
+  return { salt: bufToB64(salt), hash: bufToB64(bits) };
+}
+async function verifyPassword(password, user) {
+  if (!user) return false;
+  // legacy plaintext (migrate path)
+  if (user.password && !user.passHash) {
+    return user.password === password;
+  }
+  if (!user.passHash || !user.passSalt) return false;
+  const salt = new Uint8Array(b64ToBuf(user.passSalt));
+  const { hash } = await hashPassword(password, salt);
+  return hash === user.passHash;
+}
+async function setUserPassword(user, password) {
+  const { salt, hash } = await hashPassword(password);
+  user.passSalt = salt;
+  user.passHash = hash;
+  delete user.password; // strip plaintext
+}
+async function migrateUserPasswords() {
+  let changed = false;
+  for (const u of DB.users) {
+    if (u.password && !u.passHash) {
+      await setUserPassword(u, u.password);
+      changed = true;
+    }
+  }
+  if (changed) {
+    saveDB();
+    console.info('[algor-bank] migrated OPS passwords to PBKDF2 hashes');
+  }
 }
 
 // ── AES-256-GCM Vault (เหมือน ALGOR FALAK) ───────────────
@@ -588,6 +711,7 @@ async function decryptVault(password, vaultObj) {
 }
 
 function downloadJson(obj, filename) {
+  // fallback: browser download (no native save dialog)
   const blob = new Blob([JSON.stringify(obj, null, 2)], { type: 'application/json' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
@@ -595,6 +719,104 @@ function downloadJson(obj, filename) {
   a.download = filename;
   a.click();
   URL.revokeObjectURL(url);
+}
+
+/** Save JSON via native Save dialog when supported (Chrome/Edge), else download */
+async function saveJsonWithDialog(obj, suggestedName) {
+  const text = JSON.stringify(obj, null, 2);
+  const blob = new Blob([text], { type: 'application/json' });
+
+  if (typeof window.showSaveFilePicker === 'function') {
+    try {
+      const handle = await window.showSaveFilePicker({
+        suggestedName: suggestedName,
+        types: [{
+          description: 'ALGOR BANK Vault / JSON',
+          accept: {
+            'application/json': ['.vault', '.json'],
+            'application/octet-stream': ['.vault']
+          }
+        }]
+      });
+      const writable = await handle.createWritable();
+      await writable.write(blob);
+      await writable.close();
+      return { ok: true, method: 'picker', name: handle.name || suggestedName };
+    } catch (e) {
+      // user cancelled
+      if (e && (e.name === 'AbortError' || e.name === 'NotAllowedError')) {
+        return { ok: false, cancelled: true };
+      }
+      // other error → fallback download
+      console.warn('showSaveFilePicker failed, fallback download', e);
+    }
+  }
+
+  downloadJson(obj, suggestedName);
+  return { ok: true, method: 'download', name: suggestedName };
+}
+
+/** Open file via native Open dialog when supported */
+async function openFileWithDialog(acceptExt) {
+  if (typeof window.showOpenFilePicker === 'function') {
+    try {
+      const [handle] = await window.showOpenFilePicker({
+        multiple: false,
+        types: [{
+          description: 'ALGOR BANK Vault / JSON',
+          accept: {
+            'application/json': ['.vault', '.json'],
+            'application/octet-stream': ['.vault']
+          }
+        }]
+      });
+      const file = await handle.getFile();
+      return { ok: true, file, method: 'picker' };
+    } catch (e) {
+      if (e && (e.name === 'AbortError' || e.name === 'NotAllowedError')) {
+        return { ok: false, cancelled: true };
+      }
+      console.warn('showOpenFilePicker failed, fallback input', e);
+    }
+  }
+  return { ok: false, needInput: true };
+}
+
+async function applyLoadedData(obj, fileName) {
+  // plain JSON export (no encryption)
+  if (obj.members && !obj.ct) {
+    DB = { ...DB, ...obj };
+    ensureDBShape();
+    vaultOnlySession = !!DB.settings.vaultOnly;
+    await migrateUserPasswords();
+    saveDB();
+    audit('JSON_LOAD', fileName);
+    print(`✓ ${isEn() ? 'Loaded plain JSON from' : 'โหลด JSON ธรรมดาจาก'} ${fileName}`, 'ok');
+    print(`  ${isEn() ? 'Members' : 'สมาชิก'} ${DB.members.length} · ${isEn() ? 'Accounts' : 'บัญชี'} ${DB.accounts.length}`, 'algor');
+    return true;
+  }
+  // encrypted vault
+  if (!obj.ct || !obj.salt || !obj.iv) {
+    print(isEn() ? 'Not a valid vault file' : 'ไฟล์ไม่ใช่ vault ที่ถูกต้อง', 'error');
+    return false;
+  }
+  if (!vaultPassword) {
+    print(isEn() ? 'Set password first: SETPASS <password>' : 'ต้องตั้งรหัสผ่านก่อนด้วย SETPASS <รหัสผ่าน>', 'error');
+    print(isEn() ? '  (same password used at VAULT SAVE)' : '  (ใช้รหัสเดียวกับตอน VAULT SAVE)', 'system');
+    return false;
+  }
+  print(isEn() ? 'Decrypting ...' : 'กำลังถอดรหัส ...', 'system');
+  const data = await decryptVault(vaultPassword, obj);
+  DB = { ...DB, ...data };
+  ensureDBShape();
+  vaultOnlySession = !!DB.settings.vaultOnly;
+  await migrateUserPasswords();
+  saveDB();
+  audit('VAULT_LOAD', fileName);
+  print(`✓ ${isEn() ? 'Vault loaded from' : 'ถอดรหัสและโหลด vault สำเร็จ จาก'} ${fileName}`, 'ok');
+  print(`  ${isEn() ? 'Members' : 'สมาชิก'} ${DB.members.length} · ${isEn() ? 'Accounts' : 'บัญชี'} ${DB.accounts.length} · ${isEn() ? 'Finance' : 'สินเชื่อ'} ${DB.finances.length}`, 'algor');
+  if (isVaultOnly()) print(isEn() ? '  Mode: VAULT-ONLY' : '  โหมด: VAULT-ONLY', 'system');
+  return true;
 }
 
 function nowStr() {
@@ -632,6 +854,7 @@ let bootLangPending = true; // รอเลือกภาษาก่อนเ�
 
 function boot() {
   loadDB();
+  migrateUserPasswords().catch(e => console.warn(e));
   clearTerm();
   bootLangPending = true;
   $('mode-display').textContent = 'init';
@@ -732,7 +955,7 @@ function updateClock() {
 const WRITE_CMDS = new Set([
   'MEMBER','MEMBERS','MEM','ACCOUNT','ACCOUNTS','ACC','DEPOSIT','DEP','WITHDRAW','WD',
   'FINANCE','FIN','LOAN','SEED','RESET','SETPASS','PASS','VAULT','USER','USERS',
-  'IMPORT','CSV'
+  'IMPORT','CSV','MODE'
 ]);
 const ADMIN_ONLY = new Set(['RESET','USER','USERS']);
 
@@ -750,6 +973,32 @@ function requireLogin(write) {
 function requireAdmin() {
   if (!sessionUser || sessionUser.role !== 'ADMIN') {
     print(t('role_denied') + ' (ADMIN only)', 'error');
+    return false;
+  }
+  return true;
+}
+
+/** GUI write gate — must be logged in and not VIEW */
+function requireGuiWrite() {
+  if (!sessionUser) {
+    alert(isEn() ? 'Please LOGIN first (AUTH tab or: LOGIN admin admin123)' : 'กรุณา LOGIN ก่อน (แท็บ AUTH หรือ: LOGIN admin admin123)');
+    return false;
+  }
+  if (sessionUser.role === 'VIEW') {
+    alert(t('role_denied') + ' (VIEW)');
+    return false;
+  }
+  return true;
+}
+
+/** GUI read gate — must be logged in */
+function escapeHtml(s) {
+  return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
+function requireGuiLogin() {
+  if (!sessionUser) {
+    alert(isEn() ? 'Please LOGIN first (AUTH tab)' : 'กรุณา LOGIN ก่อน (แท็บ AUTH)');
     return false;
   }
   return true;
@@ -861,8 +1110,8 @@ register(['HELP', '?'], (args) => {
   print('');
   print('── Vault เข้ารหัส (AES-256-GCM) ──', 'menu');
   print('  SETPASS <รหัสผ่าน>  ตั้งรหัสผ่าน vault (เก็บใน memory)', 'calc');
-  print('  VAULT SAVE         เข้ารหัส + ดาวน์โหลดไฟล์ .vault', 'calc');
-  print('  VAULT LOAD         โหลดไฟล์ .vault (เลือกไฟล์)', 'calc');
+  print('  VAULT SAVE         เข้ารหัส + หน้าต่างบันทึกไฟล์ .vault', 'calc');
+  print('  VAULT LOAD         โหลดไฟล์ .vault (เลือกไฟล์ได้เรื่อยๆ)', 'calc');
   print('  VAULT STATUS       ดูสถานะรหัสผ่าน / vault', 'calc');
   print('  LOCK               ล้างรหัสผ่านออกจาก memory', 'calc');
   print('');
@@ -901,6 +1150,9 @@ register(['HELP', '?'], (args) => {
   print('');
   print('── Auth / Ops ──', 'menu');
   print('  LOGIN <user> <pass>   admin/admin123 · teller · viewer', 'calc');
+  print('  USER PASS/DEL        เปลี่ยนรหัส / ลบ user (ADMIN)', 'calc');
+  print('  AUDIT [n]            บันทึกการใช้งานล่าสุด', 'calc');
+  print('  MODE VAULT|LOCAL     โหมดไม่ใช้ localStorage / ปกติ', 'calc');
   print('  LOGOUT · WHO', 'calc');
   print('  USER LIST | USER ADD <user> <pass> [ADMIN|TELLER|VIEW]', 'calc');
   print('');
@@ -1208,6 +1460,7 @@ register(['DEPOSIT', 'DEP'], (args) => {
   a.balance += amount;
   const txDep = addTxInternal(a.id, 'DEPOSIT', amount, note);
   saveDB();
+  audit('DEPOSIT', a.id + ' ' + amount);
   print(`✓ ฝาก ${fmtMoney(amount)} เข้า ${a.id} · ยอดใหม่ ${fmtMoney(a.balance)}`, 'ok');
   if (txDep) print(`  RECEIPT ${txDep.id}  — print slip`, 'system');
 });
@@ -1226,6 +1479,7 @@ register(['WITHDRAW', 'WD'], (args) => {
   a.balance -= amount;
   const txWd = addTxInternal(a.id, 'WITHDRAW', amount, note);
   saveDB();
+  audit('WITHDRAW', a.id + ' ' + amount);
   print(`✓ ถอน ${fmtMoney(amount)} จาก ${a.id} · ยอดใหม่ ${fmtMoney(a.balance)}`, 'ok');
   if (txWd) print(`  RECEIPT ${txWd.id}  — print slip`, 'system');
 });
@@ -1411,8 +1665,11 @@ register(['SHARIA', 'ISLAMIC'], () => {
 register(['CLEAR', 'CLS'], () => { clearTerm(); print('หน้าจอถูกล้าง', 'system'); });
 register(['SAVE'], () => { saveDB(); print('✓ บันทึกข้อมูลลง localStorage แล้ว', 'ok'); });
 register(['EXPORT'], () => {
-  downloadJson(DB, `algor-bank-export-${new Date().toISOString().slice(0,10)}.json`);
-  print('✓ ส่งออกไฟล์ JSON (ไม่เข้ารหัส) แล้ว', 'ok');
+  const safe = JSON.parse(JSON.stringify(DB));
+  (safe.users || []).forEach(u => { delete u.password; });
+  downloadJson(safe, `algor-bank-export-${new Date().toISOString().slice(0,10)}.json`);
+  audit('EXPORT', 'json');
+  print(isEn() ? '✓ Exported JSON (passwords not included as plaintext)' : '✓ ส่งออก JSON แล้ว (ไม่มีรหัส plain)', 'ok');
 });
 register(['RESET'], (args) => {
   if ((args[0] || '').toUpperCase() !== 'CONFIRM') {
@@ -1444,7 +1701,7 @@ register(['SETPASS', 'PASS'], (args) => {
   }
   vaultPassword = pw;
   print('✓ ตั้งรหัสผ่าน vault แล้ว (เก็บใน memory)', 'ok');
-  print('  ถัดไป: VAULT SAVE เพื่อดาวน์โหลดไฟล์เข้ารหัส', 'system');
+  print(isEn() ? '  Next: VAULT SAVE (native save dialog)' : '  ถัดไป: VAULT SAVE (เปิดหน้าต่างบันทึกไฟล์)', 'system');
 });
 
 register(['LOCK'], () => {
@@ -1474,27 +1731,56 @@ register(['VAULT'], async (args) => {
       print(isEn() ? 'Encrypting with AES-256-GCM ...' : 'กำลังเข้ารหัสข้อมูลด้วย AES-256-GCM ...', 'system');
       const vault = await encryptVault(vaultPassword, DB);
       const fname = `algor-bank-${new Date().toISOString().slice(0,10)}.vault`;
-      downloadJson(vault, fname);
+      const result = await saveJsonWithDialog(vault, fname);
+      if (result.cancelled) {
+        print(isEn() ? 'Save cancelled' : 'ยกเลิกการบันทึก', 'warn');
+        return;
+      }
+      if (!result.ok) {
+        print(isEn() ? 'Save failed' : 'บันทึกไม่สำเร็จ', 'error');
+        return;
+      }
       DB.settings.lastVaultSave = new Date().toISOString();
       saveDB();
       const el = $('dash-reminder');
       if (el) el.textContent = '';
-      print(`✓ Vault saved → ${fname}`, 'ok');
-      print(isEn() ? '  Keep this file safe · VAULT LOAD to restore' : '  เก็บไฟล์นี้ไว้ในที่ปลอดภัย · ใช้ VAULT LOAD เพื่อกู้คืน', 'system');
+      const via = result.method === 'picker'
+        ? (isEn() ? 'Save dialog' : 'หน้าต่างบันทึก')
+        : (isEn() ? 'download' : 'ดาวน์โหลด');
+      audit('VAULT_SAVE', result.name);
+      print(`✓ Vault saved → ${result.name} (${via})`, 'ok');
+      print(isEn()
+        ? '  You can SAVE again anytime · VAULT LOAD to restore'
+        : '  บันทึกซ้ำได้เรื่อยๆ · ใช้ VAULT LOAD เพื่อกู้คืน', 'system');
     } catch (e) {
-      print('Encrypt failed: ' + e.message, 'error');
+      print('Encrypt/save failed: ' + e.message, 'error');
     }
     return;
   }
 
   if (sub === 'LOAD') {
-    // trigger hidden file input
-    const inp = document.getElementById('vault-file-input');
-    if (inp) {
-      inp.value = '';
-      inp.click();
-    } else {
-      print('ไม่พบ file input', 'error');
+    try {
+      const opened = await openFileWithDialog();
+      if (opened.cancelled) {
+        print(isEn() ? 'Load cancelled' : 'ยกเลิกการโหลด', 'warn');
+        return;
+      }
+      if (opened.ok && opened.file) {
+        const text = await opened.file.text();
+        const obj = JSON.parse(text);
+        await applyLoadedData(obj, opened.file.name);
+        return;
+      }
+      // fallback: classic file input (can be used repeatedly)
+      const inp = document.getElementById('vault-file-input');
+      if (inp) {
+        inp.value = '';
+        inp.click();
+      } else {
+        print(isEn() ? 'File picker not available' : 'ไม่พบตัวเลือกไฟล์', 'error');
+      }
+    } catch (e) {
+      print((isEn() ? 'Load failed: ' : 'โหลดล้มเหลว: ') + e.message, 'error');
     }
     return;
   }
@@ -1502,7 +1788,7 @@ register(['VAULT'], async (args) => {
   print('ใช้: VAULT STATUS | VAULT SAVE | VAULT LOAD', 'error');
 });
 
-// hidden file input for VAULT LOAD
+// hidden file input for VAULT LOAD (fallback + repeatable)
 (function setupVaultInput() {
   const inp = document.createElement('input');
   inp.type = 'file';
@@ -1516,37 +1802,15 @@ register(['VAULT'], async (args) => {
     try {
       const text = await file.text();
       const obj = JSON.parse(text);
-
-      // plain JSON export (no encryption)
-      if (obj.members && !obj.ct) {
-        DB = { ...DB, ...obj };
-        if (!DB.settings) DB.settings = { coopName: 'สหกรณ์อิสลาม ALGOR', currency: 'THB', lang: 'th', nextMemberId: 1, nextAccountId: 1, nextFinanceId: 1, nextTxId: 1 };
-        saveDB();
-        print(`✓ โหลด JSON ธรรมดาจาก ${file.name} สำเร็จ`, 'ok');
-        print(`  สมาชิก ${DB.members.length} · บัญชี ${DB.accounts.length}`, 'algor');
-        return;
-      }
-
-      // encrypted vault
-      if (!obj.ct || !obj.salt || !obj.iv) {
-        print('ไฟล์ไม่ใช่ vault ที่ถูกต้อง', 'error');
-        return;
-      }
-      if (!vaultPassword) {
-        print('ต้องตั้งรหัสผ่านก่อนด้วย SETPASS <รหัสผ่าน>', 'error');
-        print('  (ใช้รหัสเดียวกับตอน VAULT SAVE)', 'system');
-        return;
-      }
-      print('กำลังถอดรหัส ...', 'system');
-      const data = await decryptVault(vaultPassword, obj);
-      DB = { ...DB, ...data };
-      if (!DB.settings) DB.settings = { coopName: 'สหกรณ์อิสลาม ALGOR', currency: 'THB', lang: 'th', nextMemberId: 1, nextAccountId: 1, nextFinanceId: 1, nextTxId: 1 };
-      saveDB();
-      print(`✓ ถอดรหัสและโหลด vault สำเร็จ จาก ${file.name}`, 'ok');
-      print(`  สมาชิก ${DB.members.length} · บัญชี ${DB.accounts.length} · สินเชื่อ ${DB.finances.length}`, 'algor');
+      await applyLoadedData(obj, file.name);
     } catch (e) {
-      print('โหลด/ถอดรหัสล้มเหลว — รหัสผ่านผิด หรือไฟล์เสีย', 'error');
+      print(isEn()
+        ? 'Load/decrypt failed — wrong password or bad file'
+        : 'โหลด/ถอดรหัสล้มเหลว — รหัสผ่านผิด หรือไฟล์เสีย', 'error');
       console.error(e);
+    } finally {
+      // allow selecting the same file again next time
+      inp.value = '';
     }
   });
 })();
@@ -1563,7 +1827,7 @@ register(['LANG'], (args) => {
   } else print('LANG TH | LANG EN', 'error');
 });
 
-register(['LOGIN'], (args) => {
+register(['LOGIN'], async (args) => {
   const user = args[0];
   const pass = args[1];
   if (!user || !pass) {
@@ -1571,17 +1835,30 @@ register(['LOGIN'], (args) => {
     print('  demo: admin/admin123 · teller/teller123 · viewer/view123', 'system');
     return;
   }
-  const u = DB.users.find(x => x.username === user && x.password === pass);
-  if (!u) { print(isEn() ? 'Invalid credentials' : 'ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง', 'error'); return; }
+  const u = DB.users.find(x => x.username === user);
+  if (!u || !(await verifyPassword(pass, u))) {
+    print(isEn() ? 'Invalid credentials' : 'ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง', 'error');
+    audit('LOGIN_FAIL', user);
+    return;
+  }
+  // migrate legacy plaintext on successful login
+  if (u.password && !u.passHash) {
+    await setUserPassword(u, pass);
+    saveDB();
+  }
   sessionUser = { username: u.username, role: u.role, name: u.name, id: u.id };
   $('mode-display').textContent = u.role;
   print(`✓ LOGIN ${u.username} · role ${u.role}`, 'ok');
+  if (isVaultOnly()) print(isEn() ? '  Mode: VAULT-ONLY (no localStorage)' : '  โหมด: VAULT-ONLY (ไม่เขียน localStorage)', 'system');
+  audit('LOGIN', u.username);
 });
 
 register(['LOGOUT'], () => {
+  const who = sessionUser ? sessionUser.username : 'GUEST';
   sessionUser = null;
   $('mode-display').textContent = 'GUEST';
   print('✓ Logged out', 'ok');
+  audit('LOGOUT', who);
 });
 
 register(['WHO'], () => {
@@ -1589,12 +1866,15 @@ register(['WHO'], () => {
   else print(`${sessionUser.username} · ${sessionUser.role} · ${sessionUser.name || ''}`, 'ok');
 });
 
-register(['USER', 'USERS'], (args) => {
+register(['USER', 'USERS'], async (args) => {
   if (!requireAdmin()) return;
   const sub = (args[0] || 'LIST').toUpperCase();
   if (sub === 'LIST' || sub === 'USERS') {
     print('═══ OPS Users ═══', 'menu');
-    DB.users.forEach(u => print(`${u.id}  ${u.username.padEnd(12)} ${u.role.padEnd(8)} ${u.name || ''}`, 'calc'));
+    DB.users.forEach(u => {
+      const sec = u.passHash ? 'hash' : (u.password ? 'PLAIN!' : '?');
+      print(`${u.id}  ${u.username.padEnd(12)} ${u.role.padEnd(8)} ${sec.padEnd(6)} ${u.name || ''}`, 'calc');
+    });
     return;
   }
   if (sub === 'ADD') {
@@ -1602,15 +1882,98 @@ register(['USER', 'USERS'], (args) => {
     const password = args[2];
     const role = (args[3] || 'TELLER').toUpperCase();
     if (!username || !password) { print('USER ADD <username> <password> [ADMIN|TELLER|VIEW]', 'error'); return; }
+    if (password.length < 6) { print(isEn() ? 'Password min 6 chars' : 'รหัสผ่านอย่างน้อย 6 ตัว', 'error'); return; }
     if (!['ADMIN','TELLER','VIEW'].includes(role)) { print('Role: ADMIN|TELLER|VIEW', 'error'); return; }
     if (DB.users.some(u => u.username === username)) { print('Username exists', 'error'); return; }
-    const u = { id: 'U' + String(DB.users.length + 1).padStart(3, '0'), username, password, role, name: username };
+    const u = { id: 'U' + String(DB.users.length + 1).padStart(3, '0'), username, role, name: username };
+    await setUserPassword(u, password);
     DB.users.push(u);
     saveDB();
-    print(`✓ User ${username} (${role}) added`, 'ok');
+    audit('USER_ADD', `${username} ${role}`);
+    print(`✓ User ${username} (${role}) added · password hashed`, 'ok');
     return;
   }
-  print('USER LIST | USER ADD <user> <pass> [role]', 'error');
+  if (sub === 'PASS' || sub === 'PASSWORD' || sub === 'SETPASS') {
+    const username = args[1];
+    const password = args[2];
+    if (!username || !password) {
+      print('USER PASS <username> <new-password>', 'error');
+      return;
+    }
+    if (password.length < 6) { print(isEn() ? 'Password min 6 chars' : 'รหัสผ่านอย่างน้อย 6 ตัว', 'error'); return; }
+    const u = DB.users.find(x => x.username === username);
+    if (!u) { print(isEn() ? 'User not found' : 'ไม่พบผู้ใช้', 'error'); return; }
+    await setUserPassword(u, password);
+    saveDB();
+    audit('USER_PASS', username);
+    print(`✓ Password updated for ${username} (hashed)`, 'ok');
+    return;
+  }
+  if (sub === 'DEL' || sub === 'DELETE' || sub === 'RM') {
+    const username = args[1];
+    if (!username) { print('USER DEL <username>', 'error'); return; }
+    if (username === 'admin') { print(isEn() ? 'Cannot delete built-in admin' : 'ลบ admin หลักไม่ได้', 'error'); return; }
+    if (sessionUser && sessionUser.username === username) {
+      print(isEn() ? 'Cannot delete current session user' : 'ลบผู้ใช้ที่ login อยู่ไม่ได้', 'error');
+      return;
+    }
+    const idx = DB.users.findIndex(x => x.username === username);
+    if (idx < 0) { print(isEn() ? 'User not found' : 'ไม่พบผู้ใช้', 'error'); return; }
+    DB.users.splice(idx, 1);
+    saveDB();
+    audit('USER_DEL', username);
+    print(`✓ User ${username} deleted`, 'ok');
+    return;
+  }
+  print('USER LIST | USER ADD <user> <pass> [role] | USER PASS <user> <new> | USER DEL <user>', 'error');
+});
+
+register(['AUDIT', 'LOG'], (args) => {
+  if (!requireLogin(false)) return;
+  const n = Math.min(parseInt(args[0], 10) || 30, 100);
+  const rows = (DB.audit || []).slice(-n).reverse();
+  print(`═══ Audit log (last ${rows.length}) ═══`, 'menu');
+  if (!rows.length) {
+    print(isEn() ? '  (empty)' : '  (ยังไม่มีรายการ)', 'system');
+    return;
+  }
+  rows.forEach(r => {
+    const t0 = (r.ts || '').replace('T', ' ').slice(0, 19);
+    print(`${t0}  ${(r.user||'').padEnd(10)} ${(r.role||'-').padEnd(6)} ${(r.action||'').padEnd(12)} ${r.detail||''}`, 'calc');
+  });
+});
+
+register(['MODE'], (args) => {
+  if (!requireAdmin()) return;
+  const sub = (args[0] || 'STATUS').toUpperCase();
+  if (sub === 'STATUS' || sub === 'SHOW') {
+    print('═══ Storage mode ═══', 'menu');
+    print(`  vaultOnly setting : ${DB.settings.vaultOnly ? 'ON' : 'OFF'}`, 'calc');
+    print(`  session vaultOnly : ${vaultOnlySession ? 'ON' : 'OFF'}`, 'calc');
+    print(`  effective         : ${isVaultOnly() ? 'VAULT-ONLY (no localStorage writes)' : 'LOCAL (localStorage + optional vault)'}`, isVaultOnly() ? 'warn' : 'ok');
+    return;
+  }
+  if (sub === 'VAULT' || sub === 'VAULTONLY' || sub === 'VAULT-ONLY') {
+    DB.settings.vaultOnly = true;
+    vaultOnlySession = true;
+    // wipe localStorage copy for safety
+    try { localStorage.removeItem(STORAGE_KEY); } catch (e) {}
+    audit('MODE_VAULT', 'vault-only enabled');
+    print('✓ Mode: VAULT-ONLY', 'ok');
+    print(isEn()
+      ? '  Data stays in memory only · use VAULT SAVE · localStorage cleared'
+      : '  ข้อมูลอยู่ใน memory อย่างเดียว · ใช้ VAULT SAVE · ล้าง localStorage แล้ว', 'system');
+    return;
+  }
+  if (sub === 'LOCAL' || sub === 'NORMAL') {
+    DB.settings.vaultOnly = false;
+    vaultOnlySession = false;
+    saveDB();
+    audit('MODE_LOCAL', 'localStorage enabled');
+    print('✓ Mode: LOCAL (localStorage writes enabled)', 'ok');
+    return;
+  }
+  print('MODE STATUS | MODE VAULT | MODE LOCAL', 'error');
 });
 
 register(['RECEIPT', 'SLIP'], (args) => {
@@ -1661,16 +2024,20 @@ function runCommand(raw) {
   const cmd = parts[0].toUpperCase();
   const args = parts.slice(1);
 
-  // auth gate for write commands (allow LOGIN/HELP/STATUS/LANG always)
-  const free = new Set(['HELP','?','MENU','LOGIN','LOGOUT','LANG','STATUS','STAT','SHARIA','ISLAMIC','CLEAR','CLS','GUI','F7','REPORT','REP','TX','TRANSACTION','BALANCE','BAL','WHO','RECEIPT','SLIP']);
+  // auth gate: must LOGIN before any business command
+  // free without login: help, login, language, clear terminal, open panel
+  const free = new Set([
+    'HELP', '?', 'MENU', 'LOGIN', 'LOGOUT', 'LANG', 'CLEAR', 'CLS',
+    'GUI', 'F7', 'WHO', 'SHARIA', 'ISLAMIC'
+  ]);
   if (!free.has(cmd)) {
-    if (WRITE_CMDS.has(cmd) || ADMIN_ONLY.has(cmd)) {
-      if (ADMIN_ONLY.has(cmd)) {
-        if (!requireAdmin()) return;
-      } else if (!requireLogin(true)) return;
+    if (ADMIN_ONLY.has(cmd)) {
+      if (!requireAdmin()) return;
+    } else if (WRITE_CMDS.has(cmd)) {
+      if (!requireLogin(true)) return; // need TELLER/ADMIN for writes
     } else {
-      // read commands still need login optional — allow guest read of HELP already free
-      // list commands work for guest for demo; stricter: require login for everything except free
+      // read-only business commands still require any logged-in role (including VIEW)
+      if (!requireLogin(false)) return;
     }
   }
 
@@ -1763,6 +2130,19 @@ document.addEventListener('keydown', e => {
 function openGui() {
   if (bootLangPending) return;
   $('gui').classList.add('open');
+  refreshGuiAuth();
+  refreshGuiVault();
+  if (!sessionUser) {
+    // Guest: only AUTH tab — no business data exposed
+    document.querySelectorAll('.gui-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.gui-panel').forEach(p => p.classList.remove('active'));
+    const authTab = document.querySelector('.gui-tab[data-tab="auth"]');
+    if (authTab) authTab.classList.add('active');
+    const authPanel = $('gui-panel-auth');
+    if (authPanel) authPanel.classList.add('active');
+    print(isEn() ? 'Panel: LOGIN required for data tabs' : 'Panel: ต้อง LOGIN ก่อนดูข้อมูล', 'warn');
+    return;
+  }
   refreshDash();
   refreshGuiMembers();
   refreshGuiAccounts();
@@ -1773,12 +2153,20 @@ function closeGui() { $('gui').classList.remove('open'); }
 
 document.querySelectorAll('.gui-tab').forEach(tab => {
   tab.addEventListener('click', () => {
+    const tabName = tab.dataset.tab;
+    // Guest may only use AUTH (and VAULT status is gated by requireGuiLogin on actions)
+    if (!sessionUser && tabName !== 'auth') {
+      alert(isEn() ? 'Please LOGIN first (AUTH tab)' : 'กรุณา LOGIN ก่อน (แท็บ AUTH)');
+      return;
+    }
     document.querySelectorAll('.gui-tab').forEach(t => t.classList.remove('active'));
     document.querySelectorAll('.gui-panel').forEach(p => p.classList.remove('active'));
     tab.classList.add('active');
-    $('gui-panel-' + tab.dataset.tab).classList.add('active');
-    if (tab.dataset.tab === 'dash') refreshDash();
-    if (tab.dataset.tab === 'report') guiRefreshReport();
+    $('gui-panel-' + tabName).classList.add('active');
+    if (tabName === 'dash') refreshDash();
+    if (tabName === 'report') guiRefreshReport();
+    if (tabName === 'auth') refreshGuiAuth();
+    if (tabName === 'vault') refreshGuiVault();
   });
 });
 
@@ -1818,7 +2206,7 @@ function refreshDash() {
 }
 
 function guiAddMember() {
-  if (sessionUser && sessionUser.role === 'VIEW') { alert(t('role_denied')); return; }
+  if (!requireGuiWrite()) return;
   const name = $('m-name').value.trim();
   if (!name) { alert(isEn() ? 'Name required' : 'กรุณาใส่ชื่อ'); return; }
   const m = {
@@ -1845,6 +2233,7 @@ function guiClearMemberForm() {
   $('btn-m-cancel').style.display = 'none';
 }
 function guiEditMember(id) {
+  if (!requireGuiWrite()) return;
   const m = DB.members.find(x => x.id === id);
   if (!m) return;
   editingMemberId = id;
@@ -1857,6 +2246,7 @@ function guiEditMember(id) {
   $('btn-m-cancel').style.display = '';
 }
 function guiUpdateMember() {
+  if (!requireGuiWrite()) return;
   if (!editingMemberId) return;
   const m = DB.members.find(x => x.id === editingMemberId);
   if (!m) return;
@@ -1885,14 +2275,14 @@ function refreshGuiMembers() {
   const act = isEn() ? 'Edit' : 'แก้ไข';
   let html = `<table class="gui-table"><tr><th>ID</th><th>${isEn()?'Name':'ชื่อ'}</th><th>${isEn()?'Phone':'โทร'}</th><th>Status</th><th></th></tr>`;
   list.forEach(m => {
-    html += `<tr><td>${m.id}</td><td>${m.name}</td><td>${m.phone||'-'}</td><td>${m.status}</td>
-      <td><button class="gui-btn-sm" onclick="guiEditMember('${m.id}')">${act}</button></td></tr>`;
+    html += `<tr><td>${escapeHtml(m.id)}</td><td>${escapeHtml(m.name)}</td><td>${escapeHtml(m.phone||'-')}</td><td>${escapeHtml(m.status)}</td>
+      <td><button class="gui-btn-sm" onclick="guiEditMember('${escapeHtml(m.id)}')">${act}</button></td></tr>`;
   });
   html += '</table>';
   $('gui-member-list').innerHTML = list.length ? html : `<div style="color:var(--cyan-dim)">${isEn()?'No members':'ยังไม่มีสมาชิก'}</div>`;
 }
 function guiImportCsv() {
-  if (sessionUser && sessionUser.role === 'VIEW') { alert(t('role_denied')); return; }
+  if (!requireGuiWrite()) return;
   const inp = $('csv-file-input');
   if (inp) { inp.value = ''; inp.click(); }
 }
@@ -1955,7 +2345,7 @@ function refreshGuiFinance() {
 }
 
 function guiDoTx() {
-  if (sessionUser && sessionUser.role === 'VIEW') { alert(t('role_denied')); return; }
+  if (!requireGuiWrite()) return;
   const accId = $('t-acc').value.trim().toUpperCase();
   const type = $('t-type').value;
   const amount = parseFloat($('t-amount').value);
@@ -1995,6 +2385,205 @@ function guiRefreshReport() {
   html += `<div class="stat-box"><div class="lbl">${t('dash_finance')}</div><div class="val">${fmtMoney(totalFin)} THB</div></div>`;
   html += `<p style="color:var(--cyan-dim);margin-top:12px">${isEn()?'Summary for Islamic cooperative study & ops':'รายงานสรุปเบื้องต้นสำหรับการศึกษาและบริหารสหกรณ์อิสลาม'}</p>`;
   $('gui-report').innerHTML = html;
+}
+
+// ── GUI Auth ─────────────────────────────────────────────
+function refreshGuiAuth() {
+  const box = $('auth-session-val');
+  if (box) {
+    if (sessionUser) {
+      box.textContent = `${sessionUser.username} · ${sessionUser.role}` + (sessionUser.name ? ` · ${sessionUser.name}` : '');
+      box.style.color = 'var(--green)';
+    } else {
+      box.textContent = 'GUEST';
+      box.style.color = 'var(--amber)';
+    }
+  }
+  const list = $('auth-users-list');
+  if (list) {
+    let html = `<div class="gui-label" style="margin-bottom:6px">${isEn() ? 'OPS users' : 'ผู้ใช้ OPS'}</div>`;
+    html += '<table class="gui-table"><tr><th>User</th><th>Role</th><th>Name</th></tr>';
+    (DB.users || []).forEach(u => {
+      html += `<tr><td>${u.username}</td><td>${u.role}</td><td>${u.name || ''}</td></tr>`;
+    });
+    html += '</table>';
+    list.innerHTML = html;
+  }
+  const hint = $('auth-hint');
+  if (hint) {
+    hint.textContent = isEn()
+      ? 'Demo: admin / admin123 · teller / teller123 · viewer / view123'
+      : 'ตัวอย่าง: admin / admin123 · teller / teller123 · viewer / view123';
+  }
+}
+
+async function guiLogin() {
+  const user = ($('auth-user')?.value || '').trim();
+  const pass = ($('auth-pass')?.value || '').trim();
+  if (!user || !pass) {
+    alert(isEn() ? 'Enter username and password' : 'ใส่ชื่อผู้ใช้และรหัสผ่าน');
+    return;
+  }
+  const u = DB.users.find(x => x.username === user);
+  if (!u || !(await verifyPassword(pass, u))) {
+    alert(isEn() ? 'Invalid credentials' : 'ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง');
+    print(isEn() ? 'GUI LOGIN failed' : 'GUI LOGIN ไม่สำเร็จ', 'error');
+    audit('LOGIN_FAIL', user);
+    return;
+  }
+  if (u.password && !u.passHash) {
+    await setUserPassword(u, pass);
+    saveDB();
+  }
+  sessionUser = { username: u.username, role: u.role, name: u.name, id: u.id };
+  $('mode-display').textContent = u.role;
+  if ($('auth-pass')) $('auth-pass').value = '';
+  refreshGuiAuth();
+  print(`✓ [GUI] LOGIN ${u.username} · role ${u.role}`, 'ok');
+  audit('LOGIN', u.username + ' (GUI)');
+}
+
+function guiLogout() {
+  const who = sessionUser ? sessionUser.username : 'GUEST';
+  sessionUser = null;
+  $('mode-display').textContent = 'GUEST';
+  refreshGuiAuth();
+  print('✓ [GUI] Logged out', 'ok');
+  audit('LOGOUT', who + ' (GUI)');
+}
+
+// ── GUI Vault ────────────────────────────────────────────
+function refreshGuiVault() {
+  const el = $('vault-status-val');
+  if (!el) return;
+  const hasPass = !!vaultPassword;
+  const last = DB.settings.lastVaultSave
+    ? new Date(DB.settings.lastVaultSave).toLocaleString(isEn() ? 'en-GB' : 'th-TH')
+    : (isEn() ? 'never' : 'ยังไม่เคย');
+  el.innerHTML = hasPass
+    ? `${isEn() ? 'Password set' : 'ตั้งรหัสแล้ว'} (${vaultPassword.length} chars)<br><span style="color:var(--muted);font-size:11px">${isEn() ? 'Last SAVE' : 'SAVE ล่าสุด'}: ${last}</span>`
+    : `${isEn() ? 'No password — set below' : 'ยังไม่ตั้งรหัส — ตั้งด้านล่าง'}<br><span style="color:var(--muted);font-size:11px">${isEn() ? 'Last SAVE' : 'SAVE ล่าสุด'}: ${last}</span>`;
+  const hint = $('vault-hint');
+  if (hint) {
+    hint.textContent = isEn()
+      ? 'SAVE opens a system save dialog (Chrome/Edge). LOAD can be repeated anytime.'
+      : 'SAVE เปิดหน้าต่างบันทึกไฟล์ (Chrome/Edge) · LOAD โหลดซ้ำได้เรื่อยๆ';
+  }
+}
+
+function guiVaultSetPass() {
+  if (!requireGuiLogin()) return;
+  const pw = ($('vault-pass')?.value || '').trim();
+  if (pw.length < 6) {
+    alert(isEn() ? 'Password at least 6 characters' : 'รหัสผ่านอย่างน้อย 6 ตัวอักษร');
+    return;
+  }
+  vaultPassword = pw;
+  if ($('vault-pass')) $('vault-pass').value = '';
+  refreshGuiVault();
+  const msg = $('vault-msg');
+  if (msg) msg.textContent = isEn() ? '✓ Password set in memory' : '✓ ตั้งรหัสผ่านใน memory แล้ว';
+  print('✓ [GUI] Vault password set', 'ok');
+}
+
+function guiVaultLock() {
+  vaultPassword = null;
+  refreshGuiVault();
+  const msg = $('vault-msg');
+  if (msg) msg.textContent = isEn() ? '✓ Password cleared from memory' : '✓ ล้างรหัสผ่านออกจาก memory แล้ว';
+  print('✓ [GUI] Vault LOCK', 'ok');
+}
+
+async function guiVaultSave() {
+  if (!requireGuiLogin()) return;
+  if (!vaultPassword) {
+    alert(isEn() ? 'Set vault password first' : 'ตั้งรหัสผ่าน vault ก่อน');
+    return;
+  }
+  try {
+    const msg = $('vault-msg');
+    if (msg) msg.textContent = isEn() ? 'Encrypting...' : 'กำลังเข้ารหัส...';
+    const vault = await encryptVault(vaultPassword, DB);
+    const fname = `algor-bank-${new Date().toISOString().slice(0, 10)}.vault`;
+    const result = await saveJsonWithDialog(vault, fname);
+    if (result.cancelled) {
+      if (msg) msg.textContent = isEn() ? 'Save cancelled' : 'ยกเลิกการบันทึก';
+      return;
+    }
+    if (!result.ok) {
+      if (msg) msg.textContent = isEn() ? 'Save failed' : 'บันทึกไม่สำเร็จ';
+      return;
+    }
+    DB.settings.lastVaultSave = new Date().toISOString();
+    saveDB();
+    const rem = $('dash-reminder');
+    if (rem) rem.textContent = '';
+    refreshGuiVault();
+    if (msg) msg.textContent = `✓ Saved → ${result.name}`;
+    print(`✓ [GUI] Vault saved → ${result.name}`, 'ok');
+  } catch (e) {
+    print('[GUI] Vault save error: ' + e.message, 'error');
+    const msg = $('vault-msg');
+    if (msg) msg.textContent = 'Error: ' + e.message;
+  }
+}
+
+async function guiVaultLoad() {
+  if (!requireGuiLogin()) return;
+  try {
+    const msg = $('vault-msg');
+    if (msg) msg.textContent = isEn() ? 'Choose a file...' : 'เลือกไฟล์...';
+    const opened = await openFileWithDialog();
+    if (opened.cancelled) {
+      if (msg) msg.textContent = isEn() ? 'Load cancelled' : 'ยกเลิกการโหลด';
+      return;
+    }
+    if (opened.ok && opened.file) {
+      const text = await opened.file.text();
+      const obj = JSON.parse(text);
+      const ok = await applyLoadedData(obj, opened.file.name);
+      if (ok) {
+        refreshDash();
+        refreshGuiMembers();
+        refreshGuiAccounts();
+        refreshGuiFinance();
+        refreshGuiTx();
+        refreshGuiVault();
+        if (msg) msg.textContent = `✓ Loaded ${opened.file.name}`;
+      }
+      return;
+    }
+    // fallback input
+    const inp = document.getElementById('vault-file-input');
+    if (inp) {
+      inp.value = '';
+      inp.onchange = async () => {
+        const file = inp.files && inp.files[0];
+        if (!file) return;
+        try {
+          const text = await file.text();
+          const obj = JSON.parse(text);
+          const ok = await applyLoadedData(obj, file.name);
+          if (ok) {
+            refreshDash();
+            refreshGuiMembers();
+            refreshGuiAccounts();
+            refreshGuiFinance();
+            refreshGuiTx();
+            refreshGuiVault();
+            if (msg) msg.textContent = `✓ Loaded ${file.name}`;
+          }
+        } catch (e) {
+          print('[GUI] Load error: ' + e.message, 'error');
+        } finally {
+          inp.value = '';
+        }
+      };
+      inp.click();
+    }
+  } catch (e) {
+    print('[GUI] Vault load error: ' + e.message, 'error');
+  }
 }
 
 // CSV file handler
