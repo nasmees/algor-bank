@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>algor-bank — Islamic Cooperative Banking CLI</title>
+<meta name="description" content="Offline Islamic cooperative banking CLI: members, accounts, sharia finance, AES-256 vault. Zowe-style terminal. No server.">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    /* Zowe-inspired palette (match algor-bank app) */
+    --bg: #0d1117;
+    --panel: #12181f;
+    --zowe: #9673e0;
+    --zowe-bright: #b9a3f0;
+    --zowe-dim: #6b4fc4;
+    --zowe-dark: #3b1f87;
+    --text: #c8d1db;
+    --muted: #7d8a99;
+    --bright: #e6edf3;
+    --amber: #e3b341;
+    --green: #3fb950;
+    --border: #2a3340;
+    --info: #58a6ff;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'IBM Plex Sans', system-ui, sans-serif;
+    line-height: 1.65;
+    min-height: 100vh;
+  }
+  body::before {
+    content: "";
+    position: fixed; inset: 0;
+    background-image:
+      linear-gradient(rgba(150,115,224,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(150,115,224,0.04) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none; z-index: 0;
+  }
+  body::after {
+    content: "";
+    position: fixed; inset: 0; pointer-events: none; z-index: 0;
+    background: radial-gradient(ellipse 80% 50% at 50% -10%, rgba(59, 31, 135, 0.35), transparent);
+  }
+  .wrap { position: relative; z-index: 1; max-width: 880px; margin: 0 auto; padding: 0 20px 80px; }
+
+  nav {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 18px 0; border-bottom: 1px solid var(--border); margin-bottom: 40px; flex-wrap: wrap; gap: 12px;
+  }
+  nav .logo {
+    font-family: 'IBM Plex Mono', monospace; font-weight: 600;
+    color: var(--zowe-bright); font-size: 15px; letter-spacing: 0.5px;
+    text-decoration: none;
+  }
+  nav .logo span { color: var(--muted); font-weight: 500; font-size: 11px; margin-left: 6px; }
+  nav .right { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  nav .links a {
+    color: var(--muted); text-decoration: none; font-size: 13px; margin-left: 14px;
+  }
+  nav .links a:hover { color: var(--zowe-bright); }
+
+  .lang-switch {
+    display: flex; border: 1px solid var(--border); overflow: hidden;
+  }
+  .lang-switch button {
+    font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600;
+    background: transparent; color: var(--muted); border: none;
+    padding: 6px 12px; cursor: pointer; letter-spacing: 0.5px;
+  }
+  .lang-switch button.active {
+    background: var(--zowe); color: #0d1117;
+  }
+  .lang-switch button:not(.active):hover { color: var(--zowe-bright); }
+
+  .hero { text-align: center; padding: 12px 0 48px; }
+  .hero .tag {
+    display: inline-block; font-family: 'IBM Plex Mono', monospace; font-size: 11px;
+    color: var(--zowe); border: 1px solid var(--border); padding: 4px 12px;
+    margin-bottom: 20px; letter-spacing: 0.5px;
+  }
+  .hero h1 {
+    font-family: 'IBM Plex Mono', monospace; font-size: clamp(26px, 5vw, 40px);
+    font-weight: 600; color: var(--zowe-bright); letter-spacing: 1px; margin-bottom: 8px;
+  }
+  .hero .subtitle {
+    font-family: 'IBM Plex Mono', monospace; color: var(--amber); font-size: 13px; margin-bottom: 24px;
+  }
+  .hero .lead { font-size: 16.5px; color: var(--text); max-width: 600px; margin: 0 auto 32px; }
+
+  .cta-row { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; }
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-family: 'IBM Plex Mono', monospace; font-size: 13.5px; font-weight: 500;
+    text-decoration: none; padding: 12px 22px; border: 1px solid var(--zowe); transition: 0.15s;
+  }
+  .btn-primary { background: var(--zowe); color: #0d1117; }
+  .btn-primary:hover { background: var(--zowe-bright); box-shadow: 0 0 20px rgba(150,115,224,0.3); }
+  .btn-ghost { background: transparent; color: var(--zowe-bright); }
+  .btn-ghost:hover { background: rgba(150,115,224,0.1); }
+
+  .preview {
+    background: #010409; border: 1px solid var(--border); margin: 0 auto 52px;
+    max-width: 640px; overflow: hidden; box-shadow: 0 8px 32px rgba(0,0,0,0.35);
+    border-top: 2px solid var(--zowe-dim);
+  }
+  .preview-bar {
+    background: #0a0e14; border-bottom: 1px solid var(--border);
+    padding: 8px 12px; display: flex; justify-content: space-between;
+    font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--muted);
+  }
+  .preview-bar .dot { color: var(--zowe); }
+  .preview-body {
+    padding: 16px 18px; font-family: 'IBM Plex Mono', monospace;
+    font-size: 12.5px; line-height: 1.55; color: var(--text); min-height: 190px;
+  }
+  .preview-body .dim { color: var(--muted); }
+  .preview-body .cmd { color: var(--bright); }
+  .preview-body .ok { color: var(--green); }
+  .preview-body .money { color: var(--amber); }
+  .preview-body .grp { color: var(--zowe-bright); }
+  .preview-body .cursor {
+    display: inline-block; width: 8px; height: 14px; background: var(--zowe);
+    vertical-align: middle; animation: blink 1s step-end infinite;
+  }
+  @keyframes blink { 50% { opacity: 0; } }
+
+  section { margin-bottom: 52px; }
+  section h2 {
+    font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600;
+    color: var(--zowe); letter-spacing: 1.5px; text-transform: uppercase;
+    margin-bottom: 18px; padding-bottom: 8px; border-bottom: 1px solid var(--border);
+  }
+
+  .features {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px;
+  }
+  .feature {
+    background: var(--panel); border: 1px solid var(--border); padding: 16px;
+  }
+  .feature h3 {
+    font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; color: var(--zowe-bright); margin-bottom: 6px;
+  }
+  .feature p { font-size: 13.5px; color: var(--muted); }
+
+  .prose {
+    background: var(--panel); border: 1px solid var(--border); padding: 22px 24px; font-size: 14.5px;
+  }
+  .prose p { margin-bottom: 12px; color: var(--text); }
+  .prose p:last-child { margin-bottom: 0; }
+  .prose .quote {
+    border-left: 2px solid var(--zowe-dim); padding-left: 14px; color: var(--muted);
+    font-style: italic; margin: 16px 0;
+  }
+
+  .tech-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px;
+  }
+  .tech-item {
+    border: 1px solid var(--border); padding: 14px 16px; background: var(--panel);
+  }
+  .tech-item .label {
+    font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--amber);
+    letter-spacing: 0.5px; margin-bottom: 4px;
+  }
+  .tech-item .value { font-size: 13.5px; color: var(--text); }
+
+  .use-cases {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 14px;
+  }
+  .use-case {
+    background: var(--panel); border: 1px solid var(--border); padding: 18px 16px;
+  }
+  .use-case h3 {
+    font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: var(--zowe-bright); margin-bottom: 8px;
+  }
+  .use-case p { font-size: 13.5px; color: var(--muted); }
+
+  .steps { counter-reset: step; list-style: none; }
+  .steps li {
+    position: relative; padding: 12px 0 12px 48px;
+    border-bottom: 1px solid var(--border); font-size: 14.5px;
+  }
+  .steps li::before {
+    counter-increment: step; content: counter(step);
+    position: absolute; left: 0; top: 12px; width: 28px; height: 28px;
+    border: 1px solid var(--zowe-dim); color: var(--zowe-bright);
+    font-family: 'IBM Plex Mono', monospace; font-size: 12px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .steps code, .prose code, .security code, .cmds code {
+    font-family: 'IBM Plex Mono', monospace; background: rgba(150,115,224,0.12);
+    color: var(--green); padding: 1px 6px; font-size: 12.5px;
+  }
+
+  .cmds {
+    background: var(--panel); border: 1px solid var(--border); padding: 18px 20px;
+    font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; line-height: 1.7;
+  }
+  .cmds .row { display: grid; grid-template-columns: minmax(160px, 1fr) 2fr; gap: 8px; padding: 4px 0; border-bottom: 1px solid rgba(42,51,64,0.8); }
+  .cmds .row:last-child { border-bottom: none; }
+  .cmds .k { color: var(--green); }
+  .cmds .v { color: var(--muted); }
+  .cmds .group {
+    color: var(--zowe-bright); font-weight: 600; margin-top: 12px; margin-bottom: 4px;
+    padding-top: 8px; border-top: 1px solid var(--border);
+  }
+  .cmds .group:first-child { margin-top: 0; padding-top: 0; border-top: none; }
+
+  .security {
+    background: var(--panel); border: 1px solid var(--border); padding: 20px 22px; font-size: 14px;
+  }
+  .security ul { margin: 12px 0 0 18px; color: var(--muted); }
+  .security li { margin-bottom: 4px; }
+
+  .notice {
+    border-left: 3px solid var(--amber);
+    background: rgba(227, 179, 65, 0.06);
+    padding: 12px 14px; margin-top: 14px; font-size: 13.5px; color: var(--muted);
+  }
+  .notice strong { color: var(--amber); }
+
+  .guide-block {
+    background: var(--panel); border: 1px solid var(--border); padding: 18px 20px; margin-bottom: 14px;
+  }
+  .guide-block h3 {
+    font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: var(--zowe-bright); margin-bottom: 10px;
+  }
+  .guide-block .term {
+    font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; color: var(--green);
+    background: #010409; border: 1px solid var(--border); padding: 12px 14px; margin: 8px 0;
+    line-height: 1.6; overflow-x: auto;
+  }
+  .guide-block .hint { font-size: 13.5px; color: var(--muted); margin-top: 6px; }
+
+  footer {
+    border-top: 1px solid var(--border); padding-top: 24px; text-align: center;
+    font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: var(--muted);
+  }
+  footer a { color: var(--zowe-dim); text-decoration: none; }
+  footer a:hover { color: var(--zowe-bright); }
+
+  [data-lang] { display: none; }
+  html[lang="th"] [data-lang="th"],
+  html[lang="en"] [data-lang="en"] { display: block; }
+  html[lang="th"] span[data-lang="th"],
+  html[lang="en"] span[data-lang="en"] { display: inline; }
+  html[lang="th"] .cta-row [data-lang="th"],
+  html[lang="en"] .cta-row [data-lang="en"],
+  html[lang="th"] .feature [data-lang="th"],
+  html[lang="en"] .feature [data-lang="en"],
+  html[lang="th"] .use-case [data-lang="th"],
+  html[lang="en"] .use-case [data-lang="en"],
+  html[lang="th"] .tech-item [data-lang="th"],
+  html[lang="en"] .tech-item [data-lang="en"],
+  html[lang="th"] li[data-lang="th"],
+  html[lang="en"] li[data-lang="en"] { display: block; }
+  html[lang="th"] .cmds [data-lang="th"],
+  html[lang="en"] .cmds [data-lang="en"] { display: block; }
+  html[lang="th"] .guide-block [data-lang="th"],
+  html[lang="en"] .guide-block [data-lang="en"] { display: block; }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <nav>
+      <a class="logo" href="#">algor-bank <span>islamic-coop cli</span></a>
+      <div class="right">
+        <div class="lang-switch">
+          <button type="button" id="btn-th" class="active" onclick="setLang('th')">TH</button>
+          <button type="button" id="btn-en" onclick="setLang('en')">EN</button>
+        </div>
+        <div class="links">
+          <a href="#about"><span data-lang="th">เกี่ยวกับ</span><span data-lang="en">About</span></a>
+          <a href="#features"><span data-lang="th">คุณสมบัติ</span><span data-lang="en">Features</span></a>
+          <a href="#guide"><span data-lang="th">คู่มือ</span><span data-lang="en">Guide</span></a>
+          <a href="#commands"><span data-lang="th">คำสั่ง</span><span data-lang="en">Commands</span></a>
+          <a href="#start"><span data-lang="th">เริ่มใช้</span><span data-lang="en">Start</span></a>
+          <a href="https://github.com/nasmees/algor-bank" target="_blank" rel="noopener">GitHub</a>
+        </div>
+      </div>
+    </nav>
+
+    <header class="hero">
+      <div class="tag">V1.1 · ZOWE-STYLE CLI · AES-256 VAULT · OFFLINE</div>
+      <h1>algor-bank</h1>
+      <p class="subtitle">Islamic Cooperative Banking CLI · بنك تعاوني إسلامي</p>
+      <p class="lead" data-lang="th">
+        ระบบบริหารสหกรณ์อิสลามแบบ command-line ในเบราว์เซอร์ —
+        สมาชิก บัญชีออม/หุ้น สินเชื่อชารีอะฮ์ (Murabaha, Mudarabah, Qard Hasan)
+        และ vault เข้ารหัส ไม่พึ่งเซิร์ฟเวอร์
+      </p>
+      <p class="lead" data-lang="en">
+        A browser-based Islamic cooperative banking CLI —
+        members, savings/shares, sharia finance (Murabaha, Mudarabah, Qard Hasan),
+        and an AES-256 vault. No server required.
+      </p>
+      <div class="cta-row">
+        <a class="btn btn-primary" href="algor-bank-islamic-coop.html">
+          <span data-lang="th">▶ เปิด algor-bank</span>
+          <span data-lang="en">▶ Launch algor-bank</span>
+        </a>
+        <a class="btn btn-ghost" href="#guide">
+          <span data-lang="th">คู่มือใช้งาน</span>
+          <span data-lang="en">User guide</span>
+        </a>
+        <a class="btn btn-ghost" href="https://github.com/nasmees/algor-bank" target="_blank" rel="noopener">GitHub</a>
+      </div>
+    </header>
+
+    <div class="preview" aria-hidden="true">
+      <div class="preview-bar">
+        <span><span class="dot">●</span> algor-bank · profile: local</span>
+        <span>vault: aes-256 · sharia</span>
+      </div>
+      <div class="preview-body">
+        <div class="grp">Welcome to algor-bank!</div>
+        <div class="dim">Groups: members · accounts · finance · vault · report</div>
+        <br>
+        <div class="cmd">algor&gt; LOGIN admin admin123</div>
+        <div class="ok">✓ LOGIN admin · role ADMIN</div>
+        <br>
+        <div class="cmd">algor&gt; STATUS</div>
+        <div class="money">  Savings  55,000.00 · Shares  5,000.00 · Finance outstanding</div>
+        <br>
+        <div class="cmd">algor&gt; MEMBER LIST</div>
+        <div class="dim">  M001  อับดุลลอฮ์ …  ACTIVE</div>
+        <br>
+        <div class="cmd">algor&gt; <span class="cursor"></span></div>
+      </div>
+    </div>
+
+    <section id="about">
+      <h2 data-lang="th">เกี่ยวกับ</h2>
+      <h2 data-lang="en">About</h2>
+      <div class="prose">
+        <div data-lang="th">
+          <p><strong>algor-bank</strong> คือ CLI บริหารสหกรณ์อิสลามแบบ local-first
+          ออกแบบให้รู้สึกเหมือนเครื่องมือ mainframe สมัยใหม่ (แนว Zowe CLI) —
+          พิมพ์คำสั่ง จัดการสมาชิก บัญชี และสัญญาการเงินตามหลักชารีอะฮ์</p>
+          <p>ไม่มีดอกเบี้ย (Riba) · แบ่งกำไร-ขาดทุน (PLS) · ผลิตภัณฑ์ Murabaha / Mudarabah / Musharakah / Ijarah / Qard Hasan
+          ข้อมูลเก็บในเครื่อง + สำรองเป็นไฟล์ <code>.vault</code> เข้ารหัส AES-256-GCM</p>
+          <div class="quote">“members · accounts · sharia finance · vault · riba-free”</div>
+          <p>เหมาะกับการศึกษาและทดลองระบบสหกรณ์ — ไม่ทดแทนระบบบัญชีที่จดทะเบียนตามกฎหมายหรือมติ Sharia Board จริง</p>
+        </div>
+        <div data-lang="en">
+          <p><strong>algor-bank</strong> is a local-first Islamic cooperative banking CLI
+          with a modern mainframe feel (Zowe CLI style) —
+          type commands to manage members, accounts, and sharia-compliant contracts.</p>
+          <p>No Riba · Profit &amp; Loss Sharing · Murabaha / Mudarabah / Musharakah / Ijarah / Qard Hasan.
+          Data stays on device; optional AES-256-GCM <code>.vault</code> backups.</p>
+          <div class="quote">“members · accounts · sharia finance · vault · riba-free”</div>
+          <p>Built for learning and ops practice — not a replacement for licensed cooperative systems or a formal Sharia Board.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="features">
+      <h2 data-lang="th">คุณสมบัติ</h2>
+      <h2 data-lang="en">Features</h2>
+      <div class="features">
+        <div class="feature">
+          <h3 data-lang="th">สมาชิก</h3>
+          <h3 data-lang="en">Members</h3>
+          <p data-lang="th">ลงทะเบียน · ค้นหา · แก้ไข · นำเข้า CSV · สถานะ ACTIVE / RESIGNED</p>
+          <p data-lang="en">Register · search · edit · CSV import · ACTIVE / RESIGNED status</p>
+        </div>
+        <div class="feature">
+          <h3 data-lang="th">บัญชี</h3>
+          <h3 data-lang="en">Accounts</h3>
+          <p data-lang="th">ออมทรัพย์ (Wadiah) · หุ้นสมาชิก · ลงทุน Mudarabah · ฝาก/ถอน</p>
+          <p data-lang="en">Savings (Wadiah) · share capital · Mudarabah invest · deposit/withdraw</p>
+        </div>
+        <div class="feature">
+          <h3 data-lang="th">สินเชื่อชารีอะฮ์</h3>
+          <h3 data-lang="en">Sharia finance</h3>
+          <p data-lang="th">Murabaha · Mudarabah · Musharakah · Ijarah · Qard Hasan · อนุมัติ/ชำระ</p>
+          <p data-lang="en">Murabaha · Mudarabah · Musharakah · Ijarah · Qard Hasan · approve/pay</p>
+        </div>
+        <div class="feature">
+          <h3 data-lang="th">สิทธิ์ OPS</h3>
+          <h3 data-lang="en">OPS roles</h3>
+          <p data-lang="th">ADMIN / TELLER / VIEW · LOGIN · แยกสิทธิ์เขียน/อ่าน</p>
+          <p data-lang="en">ADMIN / TELLER / VIEW · LOGIN · write vs read separation</p>
+        </div>
+        <div class="feature">
+          <h3>AES-256 vault</h3>
+          <p data-lang="th">SETPASS · VAULT SAVE/LOAD · เตือนสำรองอัตโนมัติ</p>
+          <p data-lang="en">SETPASS · VAULT SAVE/LOAD · automatic backup reminders</p>
+        </div>
+        <div class="feature">
+          <h3 data-lang="th">ใบเสร็จ / Panel</h3>
+          <h3 data-lang="en">Receipts / Panel</h3>
+          <p data-lang="th">RECEIPT พิมพ์สลิป · F7 Graphical panel · Dashboard กราฟ</p>
+          <p data-lang="en">RECEIPT print slips · F7 graphical panel · dashboard charts</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="guide">
+      <h2 data-lang="th">คู่มือใช้งานทีละขั้น</h2>
+      <h2 data-lang="en">Step-by-step guide</h2>
+
+      <div class="guide-block">
+        <h3 data-lang="th">1) เปิดระบบและเลือกภาษา</h3>
+        <h3 data-lang="en">1) Launch and choose language</h3>
+        <div class="term">
+          ▶ เปิด algor-bank-islamic-coop.html<br>
+          Welcome to algor-bank!<br>
+          Select language<br>
+          &nbsp;&nbsp;1  th &nbsp;&nbsp;2  en<br>
+          algor&gt; 1
+        </div>
+        <p class="hint" data-lang="th">พิมพ์ <code>1</code> สำหรับไทย หรือ <code>2</code> สำหรับ English</p>
+        <p class="hint" data-lang="en">Type <code>1</code> for Thai or <code>2</code> for English</p>
+      </div>
+
+      <div class="guide-block">
+        <h3 data-lang="th">2) เข้าสู่ระบบ (OPS)</h3>
+        <h3 data-lang="en">2) Sign in (OPS)</h3>
+        <div class="term">
+          algor&gt; LOGIN admin admin123<br>
+          ✓ LOGIN admin · role ADMIN
+        </div>
+        <p class="hint" data-lang="th">บัญชีตัวอย่าง: <code>admin/admin123</code> (เต็ม) · <code>teller/teller123</code> (ทำรายการ) · <code>viewer/view123</code> (อ่านอย่างเดียว)</p>
+        <p class="hint" data-lang="en">Demo users: <code>admin/admin123</code> (full) · <code>teller/teller123</code> (ops) · <code>viewer/view123</code> (read-only)</p>
+      </div>
+
+      <div class="guide-block">
+        <h3 data-lang="th">3) โหลดข้อมูลตัวอย่าง</h3>
+        <h3 data-lang="en">3) Load sample data</h3>
+        <div class="term">
+          algor&gt; SEED<br>
+          ✓ โหลดข้อมูลตัวอย่างสำเร็จ<br>
+          algor&gt; STATUS
+        </div>
+        <p class="hint" data-lang="th">ถ้ามีข้อมูลอยู่แล้วใช้ <code>SEED FORCE</code> เพื่อโหลดทับ</p>
+        <p class="hint" data-lang="en">If data already exists, use <code>SEED FORCE</code> to reload</p>
+      </div>
+
+      <div class="guide-block">
+        <h3 data-lang="th">4) สมาชิก — ดู / เพิ่ม / แก้ไข</h3>
+        <h3 data-lang="en">4) Members — list / add / edit</h3>
+        <div class="term">
+          algor&gt; MEMBER LIST<br>
+          algor&gt; MEMBER ADD ยูซุฟ บิน อะหมัด 081-111-2222<br>
+          algor&gt; MEMBER M001<br>
+          algor&gt; MEMBER EDIT M001 phone=089-999-8888 address=ปัตตานี<br>
+          algor&gt; MEMBER SEARCH ยูซุฟ
+        </div>
+        <p class="hint" data-lang="th">ใน Panel (F7) มีช่องค้นหาและปุ่มแก้ไขได้เช่นกัน</p>
+        <p class="hint" data-lang="en">The F7 panel also supports search and inline edit</p>
+      </div>
+
+      <div class="guide-block">
+        <h3 data-lang="th">5) เปิดบัญชีและฝาก–ถอน</h3>
+        <h3 data-lang="en">5) Open account and deposit / withdraw</h3>
+        <div class="term">
+          algor&gt; ACCOUNT OPEN M001 SAVINGS 5000<br>
+          algor&gt; ACCOUNT LIST<br>
+          algor&gt; DEPOSIT A001 1000 เงินเดือน<br>
+          algor&gt; WITHDRAW A001 200<br>
+          algor&gt; RECEIPT T00x
+        </div>
+        <p class="hint" data-lang="th">ประเภทบัญชี: <code>SAVINGS</code> · <code>SHARE</code> · <code>INVEST</code> · หลังทำรายการใช้ <code>RECEIPT</code> พิมพ์สลิป</p>
+        <p class="hint" data-lang="en">Account types: <code>SAVINGS</code> · <code>SHARE</code> · <code>INVEST</code> · use <code>RECEIPT</code> to print a slip</p>
+      </div>
+
+      <div class="guide-block">
+        <h3 data-lang="th">6) สินเชื่อชารีอะฮ์</h3>
+        <h3 data-lang="en">6) Sharia finance</h3>
+        <div class="term">
+          algor&gt; FINANCE APPLY M001 MURABAHA 50000 12 5<br>
+          algor&gt; FINANCE APPROVE F001<br>
+          algor&gt; FINANCE PAY F001 5000<br>
+          algor&gt; FINANCE LIST
+        </div>
+        <p class="hint" data-lang="th">ผลิตภัณฑ์: <code>MURABAHA</code> · <code>MUDARABAH</code> · <code>MUSHARAKAH</code> · <code>IJARAH</code> · <code>QARD</code></p>
+        <p class="hint" data-lang="en">Products: <code>MURABAHA</code> · <code>MUDARABAH</code> · <code>MUSHARAKAH</code> · <code>IJARAH</code> · <code>QARD</code></p>
+      </div>
+
+      <div class="guide-block">
+        <h3 data-lang="th">7) สำรองข้อมูลเข้ารหัส (Vault)</h3>
+        <h3 data-lang="en">7) Encrypted backup (Vault)</h3>
+        <div class="term">
+          algor&gt; SETPASS my-secret-pass<br>
+          algor&gt; VAULT SAVE<br>
+          algor&gt; VAULT LOAD<br>
+          algor&gt; LOCK
+        </div>
+        <p class="hint" data-lang="th">รหัสผ่านอยู่ใน memory เท่านั้น · ลืมรหัส = ถอด .vault ไม่ได้ · ระบบจะเตือนถ้ายังไม่ SAVE นาน</p>
+        <p class="hint" data-lang="en">Password stays in memory only · lost password = cannot decrypt · reminders if you delay SAVE</p>
+      </div>
+
+      <div class="guide-block">
+        <h3 data-lang="th">8) นำเข้าสมาชิกจาก CSV</h3>
+        <h3 data-lang="en">8) Import members from CSV</h3>
+        <div class="term">
+          name,phone,address,id<br>
+          อับดุลลอฮ์,081-111-1111,ปัตตานี,<br>
+          ฟาติมะฮ์,082-222-2222,ยะลา,M010<br>
+          <br>
+          algor&gt; CSV
+        </div>
+        <p class="hint" data-lang="th">หรือกด CSV Import ในแท็บ Members ของ Panel (F7)</p>
+        <p class="hint" data-lang="en">Or use CSV Import on the Members tab in the F7 panel</p>
+      </div>
+    </section>
+
+    <section id="usecases">
+      <h2 data-lang="th">ตัวอย่างการนำไปใช้</h2>
+      <h2 data-lang="en">Use cases</h2>
+      <div class="use-cases">
+        <div class="use-case">
+          <h3 data-lang="th">1. ฝึกงานสหกรณ์ / ห้องเรียน</h3>
+          <h3 data-lang="en">1. Cooperative training / classroom</h3>
+          <p data-lang="th">สาธิตสมาชิก บัญชี และ Murabaha บนโปรเจกเตอร์ โดยไม่ต้องติดตั้งเซิร์ฟเวอร์</p>
+          <p data-lang="en">Demo members, accounts, and Murabaha on a projector with no server install.</p>
+        </div>
+        <div class="use-case">
+          <h3 data-lang="th">2. ทดลองโครงสร้างบัญชีสหกรณ์</h3>
+          <h3 data-lang="en">2. Prototype coop account structure</h3>
+          <p data-lang="th">ออกแบบประเภทบัญชี อัตรากำไร Murabaha และสัดส่วน Mudarabah ก่อนลงระบบจริง</p>
+          <p data-lang="en">Design account types, Murabaha margins, and Mudarabah ratios before production.</p>
+        </div>
+        <div class="use-case">
+          <h3 data-lang="th">3. เคาน์เตอร์จำลอง (Teller)</h3>
+          <h3 data-lang="en">3. Simulated teller counter</h3>
+          <p data-lang="th">LOGIN เป็น teller แล้วฝาก–ถอน พิมพ์ใบเสร็จ แยกสิทธิ์จาก admin</p>
+          <p data-lang="en">LOGIN as teller, deposit/withdraw, print receipts, separated from admin rights.</p>
+        </div>
+        <div class="use-case">
+          <h3 data-lang="th">4. สำรองข้อมูลส่วนตัวเข้ารหัส</h3>
+          <h3 data-lang="en">4. Private encrypted backup</h3>
+          <p data-lang="th">เก็บไฟล์ .vault ไว้ USB หรือคลาวด์ส่วนตัว โดยไม่ส่งรหัสผ่านออกเครื่อง</p>
+          <p data-lang="en">Store .vault files on USB or private cloud; password never leaves the device.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="commands">
+      <h2 data-lang="th">คำสั่งหลัก (Groups)</h2>
+      <h2 data-lang="en">Main commands (Groups)</h2>
+      <div class="cmds">
+        <div data-lang="th">
+          <div class="group">auth</div>
+          <div class="row"><span class="k">LOGIN / LOGOUT / WHO</span><span class="v">เข้าสู่ระบบ · ออก · ดูผู้ใช้ปัจจุบัน</span></div>
+          <div class="row"><span class="k">USER LIST / USER ADD</span><span class="v">จัดการผู้ใช้ OPS (ADMIN เท่านั้น)</span></div>
+          <div class="group">members</div>
+          <div class="row"><span class="k">MEMBER LIST</span><span class="v">รายชื่อสมาชิก</span></div>
+          <div class="row"><span class="k">MEMBER ADD …</span><span class="v">ลงทะเบียน</span></div>
+          <div class="row"><span class="k">MEMBER EDIT id …</span><span class="v">แก้ name/phone/address/status</span></div>
+          <div class="row"><span class="k">MEMBER SEARCH …</span><span class="v">ค้นหา</span></div>
+          <div class="row"><span class="k">CSV</span><span class="v">นำเข้า CSV</span></div>
+          <div class="group">accounts &amp; tx</div>
+          <div class="row"><span class="k">ACCOUNT OPEN …</span><span class="v">เปิด SAVINGS|SHARE|INVEST</span></div>
+          <div class="row"><span class="k">DEPOSIT / WITHDRAW</span><span class="v">ฝาก · ถอน</span></div>
+          <div class="row"><span class="k">TX LIST / BALANCE</span><span class="v">รายการ · ยอดคงเหลือ</span></div>
+          <div class="row"><span class="k">RECEIPT id</span><span class="v">ใบเสร็จ / พิมพ์</span></div>
+          <div class="group">finance</div>
+          <div class="row"><span class="k">FINANCE APPLY …</span><span class="v">ยื่น Murabaha / Qard / …</span></div>
+          <div class="row"><span class="k">FINANCE APPROVE / PAY</span><span class="v">อนุมัติ · ชำระ</span></div>
+          <div class="group">vault &amp; system</div>
+          <div class="row"><span class="k">SETPASS / VAULT SAVE|LOAD</span><span class="v">รหัสผ่าน · ไฟล์ .vault</span></div>
+          <div class="row"><span class="k">STATUS / REPORT / SHARIA</span><span class="v">สถานะ · รายงาน · หลักชารีอะฮ์</span></div>
+          <div class="row"><span class="k">SEED / HELP / MENU</span><span class="v">ตัวอย่าง · คู่มือ · เมนู</span></div>
+          <div class="row"><span class="k">↑ ↓</span><span class="v">เลื่อนประวัติคำสั่ง</span></div>
+        </div>
+        <div data-lang="en">
+          <div class="group">auth</div>
+          <div class="row"><span class="k">LOGIN / LOGOUT / WHO</span><span class="v">Sign in · out · current user</span></div>
+          <div class="row"><span class="k">USER LIST / USER ADD</span><span class="v">OPS users (ADMIN only)</span></div>
+          <div class="group">members</div>
+          <div class="row"><span class="k">MEMBER LIST</span><span class="v">List members</span></div>
+          <div class="row"><span class="k">MEMBER ADD …</span><span class="v">Register</span></div>
+          <div class="row"><span class="k">MEMBER EDIT id …</span><span class="v">Edit name/phone/address/status</span></div>
+          <div class="row"><span class="k">MEMBER SEARCH …</span><span class="v">Search</span></div>
+          <div class="row"><span class="k">CSV</span><span class="v">Import CSV</span></div>
+          <div class="group">accounts &amp; tx</div>
+          <div class="row"><span class="k">ACCOUNT OPEN …</span><span class="v">Open SAVINGS|SHARE|INVEST</span></div>
+          <div class="row"><span class="k">DEPOSIT / WITHDRAW</span><span class="v">Deposit · withdraw</span></div>
+          <div class="row"><span class="k">TX LIST / BALANCE</span><span class="v">Ledger · balance</span></div>
+          <div class="row"><span class="k">RECEIPT id</span><span class="v">Print slip</span></div>
+          <div class="group">finance</div>
+          <div class="row"><span class="k">FINANCE APPLY …</span><span class="v">Apply Murabaha / Qard / …</span></div>
+          <div class="row"><span class="k">FINANCE APPROVE / PAY</span><span class="v">Approve · pay</span></div>
+          <div class="group">vault &amp; system</div>
+          <div class="row"><span class="k">SETPASS / VAULT SAVE|LOAD</span><span class="v">Password · .vault file</span></div>
+          <div class="row"><span class="k">STATUS / REPORT / SHARIA</span><span class="v">Status · reports · principles</span></div>
+          <div class="row"><span class="k">SEED / HELP / MENU</span><span class="v">Sample data · help · menu</span></div>
+          <div class="row"><span class="k">↑ ↓</span><span class="v">Command history</span></div>
+        </div>
+      </div>
+      <p style="margin-top:12px;font-size:13px;color:var(--muted);font-family:'IBM Plex Mono',monospace;">
+        F1 HELP · F2 MENU · F7 PANEL · F10 SAVE
+      </p>
+    </section>
+
+    <section id="tech">
+      <h2 data-lang="th">เทคโนโลยี</h2>
+      <h2 data-lang="en">Technology</h2>
+      <div class="tech-grid">
+        <div class="tech-item">
+          <div class="label">RUNTIME</div>
+          <div class="value" data-lang="th">HTML + CSS + JavaScript ล้วน · ไม่มี framework</div>
+          <div class="value" data-lang="en">Plain HTML + CSS + JavaScript · no framework</div>
+        </div>
+        <div class="tech-item">
+          <div class="label">CRYPTO</div>
+          <div class="value">Web Crypto · AES-256-GCM · PBKDF2-SHA-256 (120k)</div>
+        </div>
+        <div class="tech-item">
+          <div class="label">UI</div>
+          <div class="value" data-lang="th">Zowe-style CLI · IBM Plex Mono · dark purple</div>
+          <div class="value" data-lang="en">Zowe-style CLI · IBM Plex Mono · dark purple</div>
+        </div>
+        <div class="tech-item">
+          <div class="label">STORAGE</div>
+          <div class="value" data-lang="th">localStorage + ไฟล์ .vault เข้ารหัส</div>
+          <div class="value" data-lang="en">localStorage + encrypted .vault files</div>
+        </div>
+        <div class="tech-item">
+          <div class="label">SHARIA</div>
+          <div class="value" data-lang="th">Riba-free · PLS · asset-backed products</div>
+          <div class="value" data-lang="en">Riba-free · PLS · asset-backed products</div>
+        </div>
+        <div class="tech-item">
+          <div class="label">PRIVACY</div>
+          <div class="value" data-lang="th">ไม่มี telemetry · ข้อมูลอยู่เครื่องคุณ</div>
+          <div class="value" data-lang="en">No telemetry · data stays on your device</div>
+        </div>
+      </div>
+    </section>
+
+    <section id="start">
+      <h2 data-lang="th">เริ่มใช้งานเร็ว</h2>
+      <h2 data-lang="en">Quick start</h2>
+      <ol class="steps">
+        <li data-lang="th">กด <strong>เปิด algor-bank</strong> (หรือเปิด <code>algor-bank-islamic-coop.html</code>)</li>
+        <li data-lang="en">Click <strong>Launch algor-bank</strong> (or open <code>algor-bank-islamic-coop.html</code>)</li>
+        <li data-lang="th">เลือกภาษา — <code>1</code> ไทย / <code>2</code> English</li>
+        <li data-lang="en">Choose language — <code>1</code> Thai / <code>2</code> English</li>
+        <li data-lang="th"><code>LOGIN admin admin123</code> แล้ว <code>SEED</code></li>
+        <li data-lang="en"><code>LOGIN admin admin123</code> then <code>SEED</code></li>
+        <li data-lang="th">ลอง <code>STATUS</code> · <code>MEMBER LIST</code> · <code>ACCOUNT LIST</code> · <code>FINANCE LIST</code></li>
+        <li data-lang="en">Try <code>STATUS</code> · <code>MEMBER LIST</code> · <code>ACCOUNT LIST</code> · <code>FINANCE LIST</code></li>
+        <li data-lang="th"><code>SETPASS …</code> แล้ว <code>VAULT SAVE</code> เพื่อสำรองเข้ารหัส</li>
+        <li data-lang="en"><code>SETPASS …</code> then <code>VAULT SAVE</code> for encrypted backup</li>
+        <li data-lang="th">กด <code>F7</code> สำหรับ Panel หรือ <code>HELP</code> สำหรับคำสั่งเต็ม</li>
+        <li data-lang="en">Press <code>F7</code> for Panel or <code>HELP</code> for the full command list</li>
+      </ol>
+    </section>
+
+    <section>
+      <h2 data-lang="th">ความปลอดภัยและข้อจำกัด</h2>
+      <h2 data-lang="en">Security &amp; limits</h2>
+      <div class="security">
+        <p style="font-family:'IBM Plex Mono',monospace;color:var(--zowe);margin-bottom:8px;font-size:13px;">
+          AES-256-GCM · PBKDF2 120k rounds · Web Crypto API
+        </p>
+        <ul data-lang="th">
+          <li>รหัสผ่าน vault ไม่ถูกเขียนลงดิสก์ — ต้องใส่ทุกครั้งที่ LOAD</li>
+          <li>ลืมรหัสผ่าน = กู้ไฟล์ .vault ไม่ได้</li>
+          <li><code>LOCK</code> ล้างรหัสออกจากหน่วยความจำเมื่อเดินจากเครื่อง</li>
+          <li>รันออฟไลน์ได้หลังโหลดหน้า</li>
+        </ul>
+        <ul data-lang="en">
+          <li>Vault password is never written to disk — required on every LOAD</li>
+          <li>Lost password = .vault cannot be recovered</li>
+          <li><code>LOCK</code> clears the password from memory when you step away</li>
+          <li>Works offline after the page has loaded</li>
+        </ul>
+        <div class="notice" data-lang="th">
+          <strong>ข้อจำกัด:</strong> เครื่องมือศึกษาและทดลองระบบสหกรณ์อิสลาม
+          ไม่ทดแทนระบบบัญชีที่จดทะเบียนตามกฎหมายไทย และควรมีที่ปรึกษาชารีอะฮ์เมื่อใช้งานจริง
+        </div>
+        <div class="notice" data-lang="en">
+          <strong>Disclaimer:</strong> Educational / ops practice tool for Islamic cooperatives.
+          Not a replacement for licensed accounting systems; use a Sharia advisor for real deployments.
+        </div>
+      </div>
+    </section>
+
+    <section style="text-align:center;margin-bottom:36px;">
+      <a class="btn btn-primary" href="algor-bank-islamic-coop.html">
+        <span data-lang="th">▶ เปิด algor-bank ตอนนี้</span>
+        <span data-lang="en">▶ Launch algor-bank now</span>
+      </a>
+    </section>
+
+    <footer>
+      <p>algor-bank · Islamic Cooperative Banking CLI · بنك تعاوني إسلامي</p>
+      <p style="margin-top:8px;">Zowe-style interface · AES-256 vault · offline</p>
+      <p style="margin-top:8px;">
+        <a href="https://github.com/nasmees/algor-bank" target="_blank" rel="noopener">github.com/nasmees/algor-bank</a>
+      </p>
+      <p style="margin-top:6px;">MIT License</p>
+    </footer>
+  </div>
+
+<script>
+function setLang(lang) {
+  document.documentElement.lang = lang;
+  document.getElementById('btn-th').classList.toggle('active', lang === 'th');
+  document.getElementById('btn-en').classList.toggle('active', lang === 'en');
+  try { localStorage.setItem('algor_bank_landing_lang', lang); } catch (e) {}
+}
+(function () {
+  let lang = 'th';
+  try {
+    const saved = localStorage.getItem('algor_bank_landing_lang');
+    if (saved === 'en' || saved === 'th') lang = saved;
+    else if ((navigator.language || '').toLowerCase().startsWith('en')) lang = 'en';
+  } catch (e) {}
+  setLang(lang);
+})();
+</script>
+</body>
+</html>
