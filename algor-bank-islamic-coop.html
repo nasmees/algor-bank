@@ -269,6 +269,7 @@
     <button class="gui-tab" data-tab="finance">FINANCE</button>
     <button class="gui-tab" data-tab="tx">TRANSACTIONS</button>
     <button class="gui-tab" data-tab="report">REPORTS</button>
+    <button class="gui-tab" data-tab="tools">TOOLS</button>
     <button class="gui-tab" data-tab="auth">AUTH</button>
     <button class="gui-tab" data-tab="vault">VAULT</button>
   </div>
@@ -278,6 +279,15 @@
       <div class="chart-wrap" id="dash-charts"></div>
       <div id="dash-sharia-note" style="margin-top:16px;color:var(--cyan-dim)"></div>
       <div id="dash-reminder" style="margin-top:8px;color:var(--amber);font-size:11px"></div>
+      <div style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap">
+        <button class="gui-btn-sm" onclick="document.querySelector('.gui-tab[data-tab=members]').click()">MEMBERS</button>
+        <button class="gui-btn-sm" onclick="document.querySelector('.gui-tab[data-tab=accounts]').click()">ACCOUNTS</button>
+        <button class="gui-btn-sm" onclick="document.querySelector('.gui-tab[data-tab=finance]').click()">FINANCE</button>
+        <button class="gui-btn-sm" onclick="document.querySelector('.gui-tab[data-tab=tx]').click()">TX</button>
+        <button class="gui-btn-sm" onclick="document.querySelector('.gui-tab[data-tab=report]').click()">REPORTS</button>
+        <button class="gui-btn-sm" onclick="document.querySelector('.gui-tab[data-tab=tools]').click()">TOOLS</button>
+        <button class="gui-btn-sm" onclick="document.querySelector('.gui-tab[data-tab=vault]').click()">VAULT</button>
+      </div>
     </div>
     <div class="gui-panel" id="gui-panel-members">
       <div class="gui-search-row">
@@ -333,6 +343,27 @@
         </div>
       </div>
       <button class="gui-btn" onclick="guiOpenAccount()">เปิดบัญชี</button>
+      <div style="margin-top:16px;border-top:1px solid var(--border);padding-top:12px">
+        <div class="gui-label" style="margin-bottom:8px;color:var(--zowe)">ฝาก / ถอน ด่วน</div>
+        <div class="gui-grid3">
+          <div>
+            <div class="gui-label">เลขบัญชี *</div>
+            <input class="gui-input" id="a-tx-acc" placeholder="A001">
+          </div>
+          <div>
+            <div class="gui-label">จำนวนเงิน</div>
+            <input class="gui-input" id="a-tx-amt" type="number" min="0" placeholder="0">
+          </div>
+          <div>
+            <div class="gui-label">หมายเหตุ</div>
+            <input class="gui-input" id="a-tx-note" placeholder="optional">
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:4px">
+          <button class="gui-btn" onclick="guiQuickDep()">+ ฝาก (Deposit)</button>
+          <button class="gui-btn-sm" onclick="guiQuickWd()">− ถอน (Withdraw)</button>
+        </div>
+      </div>
       <div id="gui-account-list" style="margin-top:12px"></div>
     </div>
     <div class="gui-panel" id="gui-panel-finance">
@@ -369,6 +400,23 @@
         </div>
       </div>
       <button class="gui-btn" onclick="guiApplyFinance()">ยื่นคำขอสินเชื่อ/การเงิน</button>
+      <div style="margin-top:14px;border-top:1px solid var(--border);padding-top:12px">
+        <div class="gui-label" style="margin-bottom:8px;color:var(--zowe)">อนุมัติ / ชำระ (Approve · Pay)</div>
+        <div class="gui-grid3">
+          <div>
+            <div class="gui-label">รหัสสัญญา *</div>
+            <input class="gui-input" id="f-pay-id" placeholder="F001">
+          </div>
+          <div>
+            <div class="gui-label">จำนวนชำระ</div>
+            <input class="gui-input" id="f-pay-amt" type="number" min="0" placeholder="0">
+          </div>
+          <div style="display:flex;align-items:end;gap:8px;flex-wrap:wrap">
+            <button class="gui-btn" onclick="guiFinanceApprove()" style="margin-top:0">APPROVE</button>
+            <button class="gui-btn-sm" onclick="guiFinancePay()">PAY</button>
+          </div>
+        </div>
+      </div>
       <div id="gui-finance-list" style="margin-top:12px"></div>
     </div>
     <div class="gui-panel" id="gui-panel-tx">
@@ -399,8 +447,54 @@
       <div id="gui-tx-list" style="margin-top:12px"></div>
     </div>
     <div class="gui-panel" id="gui-panel-report">
-      <button class="gui-btn" onclick="guiRefreshReport()">รีเฟรชรายงาน</button>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">
+        <button class="gui-btn" onclick="guiRefreshReport()">รีเฟรชรายงาน</button>
+        <button class="gui-btn-sm" onclick="guiShowSharia()">SHARIA</button>
+        <button class="gui-btn-sm" onclick="guiShowStatus()">STATUS</button>
+      </div>
       <div id="gui-report" style="margin-top:12px;font-size:12px"></div>
+    </div>
+    <div class="gui-panel" id="gui-panel-tools">
+      <div class="stat-box" style="margin-bottom:14px">
+        <div class="lbl">TOOLS · เทียบเท่า CLI</div>
+        <div class="val" style="font-size:13px;font-weight:500">SEED · EXPORT · RESET · MODE · AUDIT</div>
+      </div>
+      <div class="gui-grid2">
+        <div>
+          <div class="gui-label">ข้อมูลตัวอย่าง (SEED)</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="gui-btn" onclick="guiSeed(false)">SEED</button>
+            <button class="gui-btn-sm gui-btn-danger" onclick="guiSeed(true)">SEED FORCE</button>
+          </div>
+          <p style="color:var(--muted);font-size:11px;margin-top:6px">โหลดสมาชิก/บัญชี/สินเชื่อตัวอย่าง — FORCE ทับข้อมูลเดิม</p>
+        </div>
+        <div>
+          <div class="gui-label">ส่งออก / ล้างข้อมูล</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="gui-btn" onclick="guiExport()">EXPORT JSON</button>
+            <button class="gui-btn-sm gui-btn-danger" onclick="guiReset()">RESET CONFIRM</button>
+          </div>
+          <p style="color:var(--muted);font-size:11px;margin-top:6px">EXPORT ไม่รวมรหัส plain · RESET ล้างทั้งหมด (ADMIN)</p>
+        </div>
+        <div>
+          <div class="gui-label">โหมดเก็บข้อมูล (MODE)</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="gui-btn-sm" onclick="guiMode('STATUS')">STATUS</button>
+            <button class="gui-btn-sm" onclick="guiMode('VAULT')">VAULT-ONLY</button>
+            <button class="gui-btn-sm" onclick="guiMode('LOCAL')">LOCAL</button>
+          </div>
+          <p style="color:var(--muted);font-size:11px;margin-top:6px" id="tools-mode-hint">VAULT-ONLY = ไม่เขียน localStorage</p>
+        </div>
+        <div>
+          <div class="gui-label">Audit log</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="gui-btn-sm" onclick="guiAudit(30)">AUDIT 30</button>
+            <button class="gui-btn-sm" onclick="guiAudit(100)">AUDIT 100</button>
+          </div>
+          <p style="color:var(--muted);font-size:11px;margin-top:6px">ดูบันทึกการใช้งานล่าสุด (ต้อง LOGIN)</p>
+        </div>
+      </div>
+      <div id="gui-tools-out" style="margin-top:14px;font-size:12px;color:var(--text);white-space:pre-wrap;font-family:inherit"></div>
     </div>
     <div class="gui-panel" id="gui-panel-auth">
       <div class="stat-box" id="auth-session-box" style="margin-bottom:14px">
@@ -420,10 +514,37 @@
       <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">
         <button class="gui-btn" onclick="guiLogin()">LOGIN</button>
         <button class="gui-btn-sm" onclick="guiLogout()">LOGOUT</button>
+        <button class="gui-btn-sm" onclick="guiWho()">WHO</button>
       </div>
       <p id="auth-hint" style="margin-top:12px;color:var(--muted);font-size:12px">
         Demo: admin / admin123 · teller / teller123 · viewer / view123
       </p>
+      <div style="margin-top:16px;border-top:1px solid var(--border);padding-top:12px">
+        <div class="gui-label" style="margin-bottom:8px;color:var(--zowe)">จัดการผู้ใช้ OPS (ADMIN)</div>
+        <div class="gui-grid2">
+          <div>
+            <div class="gui-label">Username</div>
+            <input class="gui-input" id="auth-new-user" placeholder="newuser">
+          </div>
+          <div>
+            <div class="gui-label">Password</div>
+            <input class="gui-input" id="auth-new-pass" type="password" placeholder="min 6 chars">
+          </div>
+          <div>
+            <div class="gui-label">Role</div>
+            <select class="gui-select" id="auth-new-role">
+              <option value="TELLER">TELLER</option>
+              <option value="VIEW">VIEW</option>
+              <option value="ADMIN">ADMIN</option>
+            </select>
+          </div>
+          <div style="display:flex;align-items:end;gap:8px;flex-wrap:wrap">
+            <button class="gui-btn" onclick="guiUserAdd()" style="margin-top:0">USER ADD</button>
+            <button class="gui-btn-sm" onclick="guiUserPass()">USER PASS</button>
+            <button class="gui-btn-sm gui-btn-danger" onclick="guiUserDel()">USER DEL</button>
+          </div>
+        </div>
+      </div>
       <div id="auth-users-list" style="margin-top:14px"></div>
     </div>
     <div class="gui-panel" id="gui-panel-vault">
@@ -2164,7 +2285,12 @@ document.querySelectorAll('.gui-tab').forEach(tab => {
     tab.classList.add('active');
     $('gui-panel-' + tabName).classList.add('active');
     if (tabName === 'dash') refreshDash();
+    if (tabName === 'members') refreshGuiMembers();
+    if (tabName === 'accounts') refreshGuiAccounts();
+    if (tabName === 'finance') refreshGuiFinance();
+    if (tabName === 'tx') refreshGuiTx();
     if (tabName === 'report') guiRefreshReport();
+    if (tabName === 'tools') guiToolsRefresh();
     if (tabName === 'auth') refreshGuiAuth();
     if (tabName === 'vault') refreshGuiVault();
   });
@@ -2276,10 +2402,18 @@ function refreshGuiMembers() {
   let html = `<table class="gui-table"><tr><th>ID</th><th>${isEn()?'Name':'ชื่อ'}</th><th>${isEn()?'Phone':'โทร'}</th><th>Status</th><th></th></tr>`;
   list.forEach(m => {
     html += `<tr><td>${escapeHtml(m.id)}</td><td>${escapeHtml(m.name)}</td><td>${escapeHtml(m.phone||'-')}</td><td>${escapeHtml(m.status)}</td>
-      <td><button class="gui-btn-sm" onclick="guiEditMember('${escapeHtml(m.id)}')">${act}</button></td></tr>`;
+      <td style="white-space:nowrap">
+        <button class="gui-btn-sm" onclick="guiEditMember('${escapeHtml(m.id)}')">${act}</button>
+        <button class="gui-btn-sm" onclick="guiUseMember('${escapeHtml(m.id)}')" title="fill forms">ID</button>
+      </td></tr>`;
   });
   html += '</table>';
   $('gui-member-list').innerHTML = list.length ? html : `<div style="color:var(--cyan-dim)">${isEn()?'No members':'ยังไม่มีสมาชิก'}</div>`;
+}
+function guiUseMember(id) {
+  if ($('a-mid')) $('a-mid').value = id;
+  if ($('f-mid')) $('f-mid').value = id;
+  print(`[GUI] member ${id} → account/finance forms`, 'system');
 }
 function guiImportCsv() {
   if (!requireGuiWrite()) return;
@@ -2288,11 +2422,12 @@ function guiImportCsv() {
 }
 
 function guiOpenAccount() {
+  if (!requireGuiWrite()) return;
   const mid = $('a-mid').value.trim().toUpperCase();
   const type = $('a-type').value;
   const bal = parseFloat($('a-bal').value) || 0;
-  if (!mid) { alert('ใส่รหัสสมาชิก'); return; }
-  if (!DB.members.find(m => m.id === mid)) { alert('ไม่พบสมาชิก'); return; }
+  if (!mid) { alert(isEn() ? 'Member ID required' : 'ใส่รหัสสมาชิก'); return; }
+  if (!DB.members.find(m => m.id === mid)) { alert(isEn() ? 'Member not found' : 'ไม่พบสมาชิก'); return; }
   const a = {
     id: genId('A', 'nextAccountId'), memberId: mid, type, balance: bal,
     opened: new Date().toISOString().slice(0,10), status: 'ACTIVE'
@@ -2300,28 +2435,70 @@ function guiOpenAccount() {
   DB.accounts.push(a);
   if (bal > 0) addTxInternal(a.id, 'DEPOSIT', bal, 'เปิดบัญชี');
   saveDB();
+  audit('ACCOUNT_OPEN', a.id + ' ' + type);
   refreshGuiAccounts();
   refreshDash();
   print(`✓ [GUI] เปิดบัญชี ${a.id}`, 'ok');
 }
+function guiQuickDep() {
+  if (!requireGuiWrite()) return;
+  const accId = ($('a-tx-acc')?.value || '').trim().toUpperCase();
+  const amount = parseFloat($('a-tx-amt')?.value);
+  const note = ($('a-tx-note')?.value || '').trim() || 'ฝากเงิน';
+  if (!accId || isNaN(amount) || amount <= 0) { alert(isEn() ? 'Account + amount required' : 'ใส่เลขบัญชีและจำนวน'); return; }
+  const a = DB.accounts.find(x => x.id === accId);
+  if (!a) { alert(isEn() ? 'Account not found' : 'ไม่พบบัญชี'); return; }
+  if (a.status !== 'ACTIVE') { alert(isEn() ? 'Account inactive' : 'บัญชีไม่พร้อมใช้งาน'); return; }
+  a.balance += amount;
+  const tx = addTxInternal(a.id, 'DEPOSIT', amount, note);
+  saveDB();
+  audit('DEPOSIT', a.id + ' ' + amount);
+  refreshGuiAccounts();
+  refreshGuiTx();
+  refreshDash();
+  print(`✓ [GUI] ฝาก ${fmtMoney(amount)} → ${a.id} · ยอด ${fmtMoney(a.balance)}`, 'ok');
+  if (tx && confirm(isEn() ? 'Print receipt?' : 'พิมพ์ใบเสร็จ?')) showReceipt(buildTxReceipt(tx));
+}
+function guiQuickWd() {
+  if (!requireGuiWrite()) return;
+  const accId = ($('a-tx-acc')?.value || '').trim().toUpperCase();
+  const amount = parseFloat($('a-tx-amt')?.value);
+  const note = ($('a-tx-note')?.value || '').trim() || 'ถอนเงิน';
+  if (!accId || isNaN(amount) || amount <= 0) { alert(isEn() ? 'Account + amount required' : 'ใส่เลขบัญชีและจำนวน'); return; }
+  const a = DB.accounts.find(x => x.id === accId);
+  if (!a) { alert(isEn() ? 'Account not found' : 'ไม่พบบัญชี'); return; }
+  if (a.type === 'SHARE') { alert(isEn() ? 'Share account cannot withdraw directly' : 'บัญชีหุ้นถอนตรงไม่ได้'); return; }
+  if (a.balance < amount) { alert(isEn() ? 'Insufficient balance' : 'ยอดไม่พอ'); return; }
+  a.balance -= amount;
+  const tx = addTxInternal(a.id, 'WITHDRAW', amount, note);
+  saveDB();
+  audit('WITHDRAW', a.id + ' ' + amount);
+  refreshGuiAccounts();
+  refreshGuiTx();
+  refreshDash();
+  print(`✓ [GUI] ถอน ${fmtMoney(amount)} ← ${a.id} · ยอด ${fmtMoney(a.balance)}`, 'ok');
+  if (tx && confirm(isEn() ? 'Print receipt?' : 'พิมพ์ใบเสร็จ?')) showReceipt(buildTxReceipt(tx));
+}
 function refreshGuiAccounts() {
-  let html = '<table class="gui-table"><tr><th>บัญชี</th><th>สมาชิก</th><th>ประเภท</th><th>ยอด</th></tr>';
+  let html = `<table class="gui-table"><tr><th>${isEn()?'Acc':'บัญชี'}</th><th>${isEn()?'Member':'สมาชิก'}</th><th>${isEn()?'Type':'ประเภท'}</th><th>${isEn()?'Balance':'ยอด'}</th><th></th></tr>`;
   DB.accounts.forEach(a => {
-    html += `<tr><td>${a.id}</td><td>${a.memberId}</td><td>${a.type}</td><td>${fmtMoney(a.balance)}</td></tr>`;
+    html += `<tr><td>${escapeHtml(a.id)}</td><td>${escapeHtml(a.memberId)}</td><td>${escapeHtml(a.type)}</td><td class="money">${fmtMoney(a.balance)}</td>
+      <td><button class="gui-btn-sm" onclick="document.getElementById('a-tx-acc').value='${escapeHtml(a.id)}'">ใช้</button></td></tr>`;
   });
   html += '</table>';
-  $('gui-account-list').innerHTML = html;
+  $('gui-account-list').innerHTML = DB.accounts.length ? html : `<div style="color:var(--muted)">${isEn()?'No accounts':'ยังไม่มีบัญชี'}</div>`;
 }
 
 function guiApplyFinance() {
+  if (!requireGuiWrite()) return;
   const mid = $('f-mid').value.trim().toUpperCase();
   const product = $('f-product').value;
   const amount = parseFloat($('f-amount').value);
   const months = parseInt($('f-months').value) || 12;
   const margin = parseFloat($('f-margin').value) || 0;
   const ratio = $('f-ratio').value || '70:30';
-  if (!mid || isNaN(amount) || amount <= 0) { alert('ข้อมูลไม่ครบ'); return; }
-  if (!DB.members.find(m => m.id === mid)) { alert('ไม่พบสมาชิก'); return; }
+  if (!mid || isNaN(amount) || amount <= 0) { alert(isEn() ? 'Incomplete data' : 'ข้อมูลไม่ครบ'); return; }
+  if (!DB.members.find(m => m.id === mid)) { alert(isEn() ? 'Member not found' : 'ไม่พบสมาชิก'); return; }
   let totalPayable = amount;
   if (product === 'MURABAHA' || product === 'IJARAH') totalPayable = amount * (1 + margin / 100);
   const f = {
@@ -2331,17 +2508,52 @@ function guiApplyFinance() {
   };
   DB.finances.push(f);
   saveDB();
+  audit('FINANCE_APPLY', f.id + ' ' + product);
   refreshGuiFinance();
   refreshDash();
   print(`✓ [GUI] ยื่นคำขอ ${f.id}`, 'ok');
 }
+function guiFinanceApprove() {
+  if (!requireGuiWrite()) return;
+  const fid = ($('f-pay-id')?.value || '').trim().toUpperCase();
+  if (!fid) { alert(isEn() ? 'Finance ID required' : 'ใส่รหัสสัญญา'); return; }
+  const f = DB.finances.find(x => x.id === fid);
+  if (!f) { alert(isEn() ? 'Not found' : 'ไม่พบสัญญา'); return; }
+  if (f.status !== 'PENDING') { alert(isEn() ? 'Status is not PENDING' : 'สถานะไม่ใช่ PENDING'); return; }
+  f.status = 'ACTIVE';
+  f.approved = new Date().toISOString().slice(0,10);
+  saveDB();
+  audit('FINANCE_APPROVE', fid);
+  refreshGuiFinance();
+  refreshDash();
+  print(`✓ [GUI] อนุมัติ ${f.id} → ACTIVE`, 'ok');
+}
+function guiFinancePay() {
+  if (!requireGuiWrite()) return;
+  const fid = ($('f-pay-id')?.value || '').trim().toUpperCase();
+  const amt = parseFloat($('f-pay-amt')?.value);
+  if (!fid || isNaN(amt) || amt <= 0) { alert(isEn() ? 'ID + amount required' : 'ใส่รหัสและจำนวนชำระ'); return; }
+  const f = DB.finances.find(x => x.id === fid);
+  if (!f) { alert(isEn() ? 'Not found' : 'ไม่พบสัญญา'); return; }
+  if (f.status !== 'ACTIVE' && f.status !== 'APPROVED') { alert(isEn() ? 'Not ready for payment' : 'สัญญาไม่พร้อมชำระ'); return; }
+  const pay = Math.min(amt, f.remaining);
+  f.paid += pay;
+  f.remaining -= pay;
+  if (f.remaining <= 0) { f.remaining = 0; f.status = 'CLOSED'; }
+  saveDB();
+  audit('FINANCE_PAY', fid + ' ' + pay);
+  refreshGuiFinance();
+  refreshDash();
+  print(`✓ [GUI] ชำระ ${fmtMoney(pay)} · ${f.id} คงเหลือ ${fmtMoney(f.remaining)}`, 'ok');
+}
 function refreshGuiFinance() {
-  let html = '<table class="gui-table"><tr><th>รหัส</th><th>สมาชิก</th><th>ผลิตภัณฑ์</th><th>จำนวน</th><th>คงเหลือ</th><th>สถานะ</th></tr>';
+  let html = `<table class="gui-table"><tr><th>${isEn()?'ID':'รหัส'}</th><th>${isEn()?'Member':'สมาชิก'}</th><th>${isEn()?'Product':'ผลิตภัณฑ์'}</th><th>${isEn()?'Amount':'จำนวน'}</th><th>${isEn()?'Remain':'คงเหลือ'}</th><th>${isEn()?'Status':'สถานะ'}</th><th></th></tr>`;
   DB.finances.forEach(f => {
-    html += `<tr><td>${f.id}</td><td>${f.memberId}</td><td>${f.product}</td><td>${fmtMoney(f.amount)}</td><td>${fmtMoney(f.remaining)}</td><td>${f.status}</td></tr>`;
+    html += `<tr><td>${escapeHtml(f.id)}</td><td>${escapeHtml(f.memberId)}</td><td>${escapeHtml(f.product)}</td><td>${fmtMoney(f.amount)}</td><td>${fmtMoney(f.remaining)}</td><td>${escapeHtml(f.status)}</td>
+      <td><button class="gui-btn-sm" onclick="document.getElementById('f-pay-id').value='${escapeHtml(f.id)}'">ใช้</button></td></tr>`;
   });
   html += '</table>';
-  $('gui-finance-list').innerHTML = html;
+  $('gui-finance-list').innerHTML = DB.finances.length ? html : `<div style="color:var(--muted)">${isEn()?'No finance contracts':'ยังไม่มีสัญญา'}</div>`;
 }
 
 function guiDoTx() {
@@ -2370,21 +2582,69 @@ function guiDoTx() {
   }
 }
 function refreshGuiTx() {
-  let html = '<table class="gui-table"><tr><th>รหัส</th><th>บัญชี</th><th>ประเภท</th><th>จำนวน</th><th>หมายเหตุ</th></tr>';
-  DB.transactions.slice().reverse().slice(0, 20).forEach(t => {
-    html += `<tr><td>${t.id}</td><td>${t.accountId}</td><td>${t.type}</td><td>${fmtMoney(t.amount)}</td><td>${t.note||''}</td></tr>`;
+  let html = `<table class="gui-table"><tr><th>${isEn()?'ID':'รหัส'}</th><th>${isEn()?'Acc':'บัญชี'}</th><th>${isEn()?'Type':'ประเภท'}</th><th>${isEn()?'Amount':'จำนวน'}</th><th>${isEn()?'Note':'หมายเหตุ'}</th><th></th></tr>`;
+  DB.transactions.slice().reverse().slice(0, 30).forEach(tx => {
+    html += `<tr><td>${escapeHtml(tx.id)}</td><td>${escapeHtml(tx.accountId)}</td><td>${escapeHtml(tx.type)}</td><td>${fmtMoney(tx.amount)}</td><td>${escapeHtml(tx.note||'')}</td>
+      <td><button class="gui-btn-sm" onclick="guiPrintReceipt('${escapeHtml(tx.id)}')">${isEn()?'Slip':'ใบเสร็จ'}</button></td></tr>`;
   });
   html += '</table>';
-  $('gui-tx-list').innerHTML = html;
+  $('gui-tx-list').innerHTML = DB.transactions.length ? html : `<div style="color:var(--muted)">${isEn()?'No transactions':'ยังไม่มีรายการ'}</div>`;
+}
+function guiPrintReceipt(txId) {
+  const tx = DB.transactions.find(t => t.id === txId);
+  if (!tx) { alert(isEn() ? 'Not found' : 'ไม่พบรายการ'); return; }
+  showReceipt(buildTxReceipt(tx));
+  print(`✓ [GUI] Receipt ${tx.id}`, 'ok');
 }
 
 function guiRefreshReport() {
+  if (!requireGuiLogin()) return;
   const totalAssets = DB.accounts.reduce((s, a) => s + a.balance, 0);
+  const totalSav = DB.accounts.filter(a => a.type === 'SAVINGS').reduce((s, a) => s + a.balance, 0);
+  const totalShare = DB.accounts.filter(a => a.type === 'SHARE').reduce((s, a) => s + a.balance, 0);
+  const totalInv = DB.accounts.filter(a => a.type === 'INVEST').reduce((s, a) => s + a.balance, 0);
   const totalFin = DB.finances.filter(f => f.status === 'ACTIVE' || f.status === 'APPROVED').reduce((s, f) => s + f.remaining, 0);
-  let html = `<div class="stat-box"><div class="lbl">${isEn()?'Total assets':'สินทรัพย์รวม'}</div><div class="val">${fmtMoney(totalAssets)} THB</div></div>`;
-  html += `<div class="stat-box"><div class="lbl">${t('dash_finance')}</div><div class="val">${fmtMoney(totalFin)} THB</div></div>`;
-  html += `<p style="color:var(--cyan-dim);margin-top:12px">${isEn()?'Summary for Islamic cooperative study & ops':'รายงานสรุปเบื้องต้นสำหรับการศึกษาและบริหารสหกรณ์อิสลาม'}</p>`;
+  let html = `<div class="gui-grid3" style="margin-bottom:12px">
+    <div class="stat-box"><div class="lbl">${isEn()?'Total assets':'สินทรัพย์รวม'}</div><div class="val">${fmtMoney(totalAssets)}</div></div>
+    <div class="stat-box"><div class="lbl">${t('dash_finance')}</div><div class="val">${fmtMoney(totalFin)}</div></div>
+    <div class="stat-box"><div class="lbl">${t('dash_members')}</div><div class="val">${DB.members.length}</div></div>
+  </div>`;
+  html += `<div style="color:var(--zowe);margin:8px 0 4px">${isEn()?'By account type':'แยกตามประเภทบัญชี'}</div>`;
+  html += `<table class="gui-table"><tr><th>Type</th><th>Count</th><th>Balance</th></tr>
+    <tr><td>SAVINGS</td><td>${DB.accounts.filter(a=>a.type==='SAVINGS').length}</td><td>${fmtMoney(totalSav)}</td></tr>
+    <tr><td>SHARE</td><td>${DB.accounts.filter(a=>a.type==='SHARE').length}</td><td>${fmtMoney(totalShare)}</td></tr>
+    <tr><td>INVEST</td><td>${DB.accounts.filter(a=>a.type==='INVEST').length}</td><td>${fmtMoney(totalInv)}</td></tr>
+  </table>`;
+  html += `<div style="color:var(--zowe);margin:12px 0 4px">${isEn()?'Finance by product':'สินเชื่อแยกผลิตภัณฑ์'}</div>`;
+  html += '<table class="gui-table"><tr><th>Product</th><th>Count</th><th>Remaining</th></tr>';
+  Object.keys(PRODUCT_DESC).forEach(p => {
+    const list = DB.finances.filter(f => f.product === p);
+    if (list.length) {
+      const rem = list.reduce((s, f) => s + f.remaining, 0);
+      html += `<tr><td>${p}</td><td>${list.length}</td><td>${fmtMoney(rem)}</td></tr>`;
+    }
+  });
+  html += '</table>';
+  html += `<p style="color:var(--muted);margin-top:12px;font-size:11px">${t('sharia_note')}</p>`;
   $('gui-report').innerHTML = html;
+}
+function guiShowSharia() {
+  if (!requireGuiLogin()) return;
+  const lines = isEn()
+    ? ['1. No Riba (interest)', '2. Profit & Loss Sharing (Mudarabah / Musharakah)', '3. Asset-backed transactions', '4. No excessive Gharar or Maysir', '5. Qard Hasan — interest-free benevolent loan', '6. Murabaha — cost-plus disclosed sale', '7. Ijarah — Islamic lease', '8. Wadiah savings — safekeeping']
+    : ['1. ห้าม Riba (ดอกเบี้ย)', '2. Profit & Loss Sharing (Mudarabah / Musharakah)', '3. ผูกกับสินทรัพย์จริง (Asset-backed)', '4. ห้าม Gharar / Maysir เกินควร', '5. Qard Hasan — กู้ดีไม่มีดอก', '6. Murabaha — ขายผ่อนเปิดเผยต้นทุน+กำไร', '7. Ijarah — เช่า / เช่าซื้อ', '8. Wadiah — ออมแบบรักษาทรัพย์'];
+  let html = `<div class="stat-box"><div class="lbl">SHARIA</div><div class="val" style="font-size:14px">${isEn()?'Principles':'หลักการชารีอะฮ์'}</div></div>`;
+  html += '<ul style="margin:12px 0 0 18px;line-height:1.7;color:var(--text)">';
+  lines.forEach(l => { html += `<li>${l}</li>`; });
+  html += '</ul>';
+  html += `<p style="color:var(--warn);margin-top:12px;font-size:11px">${isEn()?'For study/ops — real use needs a Sharia Board.':'เพื่อการศึกษา/บริหาร — ใช้งานจริงควรมี Sharia Board กำกับ'}</p>`;
+  $('gui-report').innerHTML = html;
+  print(isEn() ? '[GUI] SHARIA principles shown' : '[GUI] แสดงหลักชารีอะฮ์', 'system');
+}
+function guiShowStatus() {
+  if (!requireGuiLogin()) return;
+  guiRefreshReport();
+  print(isEn() ? '[GUI] STATUS / REPORT refreshed' : '[GUI] รีเฟรช STATUS / REPORT', 'system');
 }
 
 // ── GUI Auth ─────────────────────────────────────────────
@@ -2439,6 +2699,11 @@ async function guiLogin() {
   $('mode-display').textContent = u.role;
   if ($('auth-pass')) $('auth-pass').value = '';
   refreshGuiAuth();
+  refreshDash();
+  refreshGuiMembers();
+  refreshGuiAccounts();
+  refreshGuiFinance();
+  refreshGuiTx();
   print(`✓ [GUI] LOGIN ${u.username} · role ${u.role}`, 'ok');
   audit('LOGIN', u.username + ' (GUI)');
 }
@@ -2450,6 +2715,155 @@ function guiLogout() {
   refreshGuiAuth();
   print('✓ [GUI] Logged out', 'ok');
   audit('LOGOUT', who + ' (GUI)');
+}
+function guiWho() {
+  if (!sessionUser) {
+    alert('GUEST (not logged in)');
+    print('GUEST (not logged in)', 'warn');
+  } else {
+    const msg = `${sessionUser.username} · ${sessionUser.role} · ${sessionUser.name || ''}`;
+    alert(msg);
+    print(msg, 'ok');
+  }
+}
+async function guiUserAdd() {
+  if (!sessionUser || sessionUser.role !== 'ADMIN') {
+    alert(t('role_denied') + ' (ADMIN only)');
+    return;
+  }
+  const username = ($('auth-new-user')?.value || '').trim();
+  const password = ($('auth-new-pass')?.value || '').trim();
+  const role = ($('auth-new-role')?.value || 'TELLER').toUpperCase();
+  if (!username || !password) { alert('USER ADD <user> <pass>'); return; }
+  if (password.length < 6) { alert(isEn() ? 'Password min 6 chars' : 'รหัสผ่านอย่างน้อย 6 ตัว'); return; }
+  if (!['ADMIN','TELLER','VIEW'].includes(role)) { alert('Role: ADMIN|TELLER|VIEW'); return; }
+  if (DB.users.some(u => u.username === username)) { alert('Username exists'); return; }
+  const u = { id: 'U' + String(DB.users.length + 1).padStart(3, '0'), username, role, name: username };
+  await setUserPassword(u, password);
+  DB.users.push(u);
+  saveDB();
+  audit('USER_ADD', `${username} ${role}`);
+  if ($('auth-new-user')) $('auth-new-user').value = '';
+  if ($('auth-new-pass')) $('auth-new-pass').value = '';
+  refreshGuiAuth();
+  print(`✓ [GUI] User ${username} (${role}) added`, 'ok');
+}
+async function guiUserPass() {
+  if (!sessionUser || sessionUser.role !== 'ADMIN') {
+    alert(t('role_denied') + ' (ADMIN only)');
+    return;
+  }
+  const username = ($('auth-new-user')?.value || '').trim();
+  const password = ($('auth-new-pass')?.value || '').trim();
+  if (!username || !password) { alert('USER PASS: fill username + new password'); return; }
+  if (password.length < 6) { alert(isEn() ? 'Password min 6 chars' : 'รหัสผ่านอย่างน้อย 6 ตัว'); return; }
+  const u = DB.users.find(x => x.username === username);
+  if (!u) { alert(isEn() ? 'User not found' : 'ไม่พบผู้ใช้'); return; }
+  await setUserPassword(u, password);
+  saveDB();
+  audit('USER_PASS', username);
+  if ($('auth-new-pass')) $('auth-new-pass').value = '';
+  refreshGuiAuth();
+  print(`✓ [GUI] Password updated for ${username}`, 'ok');
+}
+function guiUserDel() {
+  if (!sessionUser || sessionUser.role !== 'ADMIN') {
+    alert(t('role_denied') + ' (ADMIN only)');
+    return;
+  }
+  const username = ($('auth-new-user')?.value || '').trim();
+  if (!username) { alert('USER DEL: fill username'); return; }
+  if (username === 'admin') { alert(isEn() ? 'Cannot delete built-in admin' : 'ลบ admin หลักไม่ได้'); return; }
+  if (sessionUser.username === username) { alert(isEn() ? 'Cannot delete current session user' : 'ลบผู้ใช้ที่ login อยู่ไม่ได้'); return; }
+  const idx = DB.users.findIndex(x => x.username === username);
+  if (idx < 0) { alert(isEn() ? 'User not found' : 'ไม่พบผู้ใช้'); return; }
+  if (!confirm(isEn() ? `Delete user ${username}?` : `ลบผู้ใช้ ${username}?`)) return;
+  DB.users.splice(idx, 1);
+  saveDB();
+  audit('USER_DEL', username);
+  refreshGuiAuth();
+  print(`✓ [GUI] User ${username} deleted`, 'ok');
+}
+
+// ── GUI Tools (SEED / EXPORT / RESET / MODE / AUDIT) ─────
+function guiToolsRefresh() {
+  const out = $('gui-tools-out');
+  if (!out) return;
+  const mode = isVaultOnly() ? 'VAULT-ONLY' : 'LOCAL';
+  out.textContent = (isEn()
+    ? `Storage: ${mode} · Members ${DB.members.length} · Accounts ${DB.accounts.length} · Finance ${DB.finances.length} · Tx ${DB.transactions.length}`
+    : `โหมดเก็บ: ${mode} · สมาชิก ${DB.members.length} · บัญชี ${DB.accounts.length} · สินเชื่อ ${DB.finances.length} · รายการ ${DB.transactions.length}`);
+  const hint = $('tools-mode-hint');
+  if (hint) {
+    hint.textContent = isVaultOnly()
+      ? (isEn() ? 'Current: VAULT-ONLY (no localStorage)' : 'ปัจจุบัน: VAULT-ONLY (ไม่เขียน localStorage)')
+      : (isEn() ? 'Current: LOCAL (localStorage enabled)' : 'ปัจจุบัน: LOCAL (ใช้ localStorage)');
+  }
+}
+function guiSeed(force) {
+  if (!requireGuiWrite()) return;
+  if (DB.members.length > 0 && !force) {
+    alert(isEn() ? 'Data exists — use SEED FORCE to overwrite' : 'มีข้อมูลอยู่แล้ว — ใช้ SEED FORCE เพื่อทับ');
+    return;
+  }
+  if (force && !confirm(isEn() ? 'Overwrite all sample data?' : 'ทับข้อมูลตัวอย่างทั้งหมด?')) return;
+  runCommand(force ? 'SEED FORCE' : 'SEED');
+  refreshDash();
+  refreshGuiMembers();
+  refreshGuiAccounts();
+  refreshGuiFinance();
+  refreshGuiTx();
+  guiToolsRefresh();
+}
+function guiExport() {
+  if (!requireGuiLogin()) return;
+  runCommand('EXPORT');
+  const out = $('gui-tools-out');
+  if (out) out.textContent = isEn() ? '✓ EXPORT JSON started (download)' : '✓ ส่งออก JSON แล้ว (ดาวน์โหลด)';
+}
+function guiReset() {
+  if (!sessionUser || sessionUser.role !== 'ADMIN') {
+    alert(t('role_denied') + ' (ADMIN only)');
+    return;
+  }
+  if (!confirm(isEn() ? 'RESET CONFIRM — erase ALL data?' : 'RESET CONFIRM — ล้างข้อมูลทั้งหมด?')) return;
+  runCommand('RESET CONFIRM');
+  refreshDash();
+  refreshGuiMembers();
+  refreshGuiAccounts();
+  refreshGuiFinance();
+  refreshGuiTx();
+  guiToolsRefresh();
+  const out = $('gui-tools-out');
+  if (out) out.textContent = isEn() ? '✓ All data cleared' : '✓ ล้างข้อมูลทั้งหมดแล้ว';
+}
+function guiMode(sub) {
+  if (sub === 'STATUS') {
+    runCommand('MODE STATUS');
+    guiToolsRefresh();
+    return;
+  }
+  if (!sessionUser || sessionUser.role !== 'ADMIN') {
+    alert(t('role_denied') + ' (ADMIN only)');
+    return;
+  }
+  runCommand('MODE ' + sub);
+  guiToolsRefresh();
+}
+function guiAudit(n) {
+  if (!requireGuiLogin()) return;
+  runCommand('AUDIT ' + (n || 30));
+  const rows = (DB.audit || []).slice(-(n || 30)).reverse();
+  const out = $('gui-tools-out');
+  if (!out) return;
+  if (!rows.length) {
+    out.textContent = isEn() ? '(audit empty)' : '(ยังไม่มี audit)';
+    return;
+  }
+  out.textContent = rows.map(r => {
+    const t0 = (r.ts || '').replace('T', ' ').slice(0, 19);
+    return `${t0}  ${(r.user||'').padEnd(10)} ${(r.role||'-').padEnd(6)} ${(r.action||'').padEnd(12)} ${r.detail||''}`;
+  }).join('\n');
 }
 
 // ── GUI Vault ────────────────────────────────────────────
