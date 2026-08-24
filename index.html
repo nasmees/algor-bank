@@ -277,6 +277,7 @@
         <div class="links">
           <a href="#about"><span data-lang="th">เกี่ยวกับ</span><span data-lang="en">About</span></a>
           <a href="#features"><span data-lang="th">คุณสมบัติ</span><span data-lang="en">Features</span></a>
+          <a href="#whats-new"><span data-lang="th">ของใหม่</span><span data-lang="en">New</span></a>
           <a href="#guide"><span data-lang="th">คู่มือ</span><span data-lang="en">Guide</span></a>
           <a href="#commands"><span data-lang="th">คำสั่ง</span><span data-lang="en">Commands</span></a>
           <a href="#start"><span data-lang="th">เริ่มใช้</span><span data-lang="en">Start</span></a>
@@ -399,6 +400,48 @@
           <p data-lang="en">RECEIPT print slips · F7 graphical panel · dashboard charts</p>
         </div>
       </div>
+
+      <!-- Added: what is new (does not replace cards above) -->
+      <div id="whats-new"></div>
+      <h2 style="margin-top:28px" data-lang="th">เพิ่มเติมในเวอร์ชันล่าสุด</h2>
+      <h2 style="margin-top:28px" data-lang="en">Added in the latest version</h2>
+      <div class="features">
+        <div class="feature">
+          <h3 data-lang="th">ลบ / แก้ไขครบ</h3>
+          <h3 data-lang="en">Delete / update</h3>
+          <p data-lang="th">สมาชิก บัญชี สินเชื่อ — ลบและแก้ไขได้ทั้ง CLI และ GUI</p>
+          <p data-lang="en">Members, accounts, finance — delete and edit in CLI and GUI</p>
+        </div>
+        <div class="feature">
+          <h3 data-lang="th">ตารางผ่อนสินเชื่อ</h3>
+          <h3 data-lang="en">Installment schedule</h3>
+          <p data-lang="th">วัตถุประสงค์ · ค่างวด · งวดที่จ่าย/คงเหลือ · FINANCE SCHEDULE</p>
+          <p data-lang="en">Purpose · installment amount · paid/remaining periods · FINANCE SCHEDULE</p>
+        </div>
+        <div class="feature">
+          <h3 data-lang="th">ประเมิน 5C</h3>
+          <h3 data-lang="en">5C assessment</h3>
+          <p data-lang="th">Character · Capacity · Capital · Collateral · Condition (CLI + แท็บ 5C)</p>
+          <p data-lang="en">Character · Capacity · Capital · Collateral · Condition (CLI + 5C tab)</p>
+        </div>
+        <div class="feature">
+          <h3 data-lang="th">สลิป PDF</h3>
+          <h3 data-lang="en">PDF slips</h3>
+          <p data-lang="th">ครึ่ง A4 · PRINT + ดาวน์โหลด PDF · หัวสถาบันจาก SETTINGS</p>
+          <p data-lang="en">Half A4 · PRINT + PDF download · institution header from SETTINGS</p>
+        </div>
+        <div class="feature">
+          <h3 data-lang="th">จัดการ user ใน GUI</h3>
+          <h3 data-lang="en">User management GUI</h3>
+          <p data-lang="th">แท็บ AUTH — เพิ่ม แก้ รีเซ็ตรหัส ลบ (ADMIN) · รหัสแบบ hash</p>
+          <p data-lang="en">AUTH tab — add, edit, reset password, delete (ADMIN) · hashed passwords</p>
+        </div>
+        <div class="feature">
+          <h3>MODE VAULT · AUDIT</h3>
+          <p data-lang="th">โหมดไม่เขียน localStorage · บันทึก audit ว่าใครทำอะไร</p>
+          <p data-lang="en">No-localStorage mode · audit log of who did what</p>
+        </div>
+      </div>
     </section>
 
     <section id="guide">
@@ -497,6 +540,30 @@
       </div>
 
       <div class="guide-block">
+        <h3 data-lang="th">เพิ่มเติม) ตั้งค่าสถาบัน (หัวสลิป)</h3>
+        <h3 data-lang="en">Added) Institution settings (slip header)</h3>
+        <div class="term">
+          algor&gt; SETTINGS name=สหกรณ์อิสลามตัวอย่าง branch=สาขาเมือง<br>
+          algor&gt; SETTINGS phone=073-xxx-xxx email=info@coop.local address=ปัตตานี
+        </div>
+        <p class="hint" data-lang="th">หรือแท็บ <strong>SETTINGS</strong> ใน Panel (F7) — ข้อมูลขึ้นบนทุกสลิป/PDF</p>
+        <p class="hint" data-lang="en">Or use the <strong>SETTINGS</strong> tab in the F7 panel — appears on every slip/PDF</p>
+      </div>
+
+      <div class="guide-block">
+        <h3 data-lang="th">เพิ่มเติม) จัดการ user OPS</h3>
+        <h3 data-lang="en">Added) Manage OPS users</h3>
+        <div class="term">
+          algor&gt; USER LIST<br>
+          algor&gt; USER ADD somchai pass1234 TELLER<br>
+          algor&gt; USER PASS somchai newpass99<br>
+          algor&gt; USER EDIT somchai role=VIEW name=สมชาย
+        </div>
+        <p class="hint" data-lang="th">เฉพาะ ADMIN · ใน GUI แท็บ AUTH มีปุ่มเพิ่ม/แก้/รีเซ็ตรหัส/ลบ</p>
+        <p class="hint" data-lang="en">ADMIN only · GUI AUTH tab has add/edit/reset/delete buttons</p>
+      </div>
+
+      <div class="guide-block">
         <h3 data-lang="th">8) นำเข้าสมาชิกจาก CSV</h3>
         <h3 data-lang="en">8) Import members from CSV</h3>
         <div class="term">
@@ -569,6 +636,12 @@
           <div class="row"><span class="k">STATUS / REPORT / SHARIA</span><span class="v">สถานะ · รายงาน · หลักชารีอะฮ์</span></div>
           <div class="row"><span class="k">SEED / HELP / MENU</span><span class="v">ตัวอย่าง · คู่มือ · เมนู</span></div>
           <div class="row"><span class="k">↑ ↓</span><span class="v">เลื่อนประวัติคำสั่ง</span></div>
+          <div class="group">เพิ่มเติม (ใหม่)</div>
+          <div class="row"><span class="k">MEMBER DEL · ACCOUNT CLOSE/DEL</span><span class="v">ลบสมาชิก · ปิด/ลบบัญชี</span></div>
+          <div class="row"><span class="k">FINANCE SCHEDULE / EDIT / DEL</span><span class="v">ตารางงวด · แก้ · ลบสัญญา</span></div>
+          <div class="row"><span class="k">5C · SETTINGS · AUDIT</span><span class="v">ประเมิน 5C · หัวสลิป · audit log</span></div>
+          <div class="row"><span class="k">USER EDIT/PASS/DEL · MODE VAULT</span><span class="v">จัดการ user · โหมดไม่ใช้ localStorage</span></div>
+          <div class="row"><span class="k">RECEIPT → PDF</span><span class="v">ดาวน์โหลดสลิปเป็นไฟล์ PDF</span></div>
         </div>
         <div data-lang="en">
           <div class="group">auth</div>
@@ -593,6 +666,12 @@
           <div class="row"><span class="k">STATUS / REPORT / SHARIA</span><span class="v">Status · reports · principles</span></div>
           <div class="row"><span class="k">SEED / HELP / MENU</span><span class="v">Sample data · help · menu</span></div>
           <div class="row"><span class="k">↑ ↓</span><span class="v">Command history</span></div>
+          <div class="group">added (new)</div>
+          <div class="row"><span class="k">MEMBER DEL · ACCOUNT CLOSE/DEL</span><span class="v">Delete member · close/delete account</span></div>
+          <div class="row"><span class="k">FINANCE SCHEDULE / EDIT / DEL</span><span class="v">Schedule · edit · delete contract</span></div>
+          <div class="row"><span class="k">5C · SETTINGS · AUDIT</span><span class="v">5C score · slip header · audit log</span></div>
+          <div class="row"><span class="k">USER EDIT/PASS/DEL · MODE VAULT</span><span class="v">User admin · vault-only mode</span></div>
+          <div class="row"><span class="k">RECEIPT → PDF</span><span class="v">Download slip as PDF file</span></div>
         </div>
       </div>
       <p style="margin-top:12px;font-size:13px;color:var(--muted);font-family:'IBM Plex Mono',monospace;">

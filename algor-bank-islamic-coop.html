@@ -173,11 +173,33 @@
     box-shadow: 0 0 0 1px var(--zowe-dim);
   }
   .gui-btn {
-    background: var(--zowe-dark); border: 1px solid var(--zowe-dim);
-    color: var(--zowe-bright); padding: 6px 14px; cursor: pointer;
+    background: linear-gradient(180deg, #7c5cbf 0%, #5b3fa0 100%);
+    border: 1px solid #9b7fd9;
+    color: #fff; padding: 7px 16px; cursor: pointer;
     font-family: inherit; margin-top: 8px; font-size: 12px; font-weight: 600;
+    border-radius: 4px; transition: background 0.15s, box-shadow 0.15s, transform 0.1s;
   }
-  .gui-btn:hover { background: var(--zowe-dim); color: #fff; }
+  .gui-btn:hover {
+    background: linear-gradient(180deg, #9673e0 0%, #6b4fc4 100%);
+    box-shadow: 0 0 12px rgba(150,115,224,0.35);
+  }
+  .gui-btn:active { transform: translateY(1px); }
+  .gui-btn-success {
+    background: linear-gradient(180deg, #3fb950 0%, #2ea043 100%);
+    border-color: #56d364; color: #fff;
+  }
+  .gui-btn-success:hover {
+    background: linear-gradient(180deg, #56d364 0%, #3fb950 100%);
+    box-shadow: 0 0 12px rgba(63,185,80,0.3);
+  }
+  .gui-btn-warn {
+    background: linear-gradient(180deg, #d29922 0%, #bb8009 100%);
+    border-color: #e3b341; color: #0d1117;
+  }
+  .gui-btn-warn:hover {
+    background: linear-gradient(180deg, #e3b341 0%, #d29922 100%);
+    box-shadow: 0 0 12px rgba(227,179,65,0.3);
+  }
   .gui-table { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 12px; }
   .gui-table th {
     text-align: left; color: var(--zowe); border-bottom: 1px solid var(--border);
@@ -204,21 +226,71 @@
   .gui-search-row { display: flex; gap: 8px; margin-bottom: 10px; align-items: end; }
   .gui-search-row .gui-input { flex: 1; }
   .gui-btn-sm {
-    background: transparent; border: 1px solid var(--border);
-    color: var(--zowe); padding: 5px 10px; cursor: pointer;
+    background: #1a2230; border: 1px solid #3d4f6f;
+    color: #b9a3f0; padding: 5px 11px; cursor: pointer;
     font-family: inherit; font-size: 11px; white-space: nowrap;
+    border-radius: 3px; transition: background 0.15s, border-color 0.15s;
   }
-  .gui-btn-sm:hover { border-color: var(--zowe-dim); background: #161b22; }
-  .gui-btn-danger { border-color: var(--error); color: var(--error); }
+  .gui-btn-sm:hover {
+    border-color: #9673e0; background: #243049; color: #e6edf3;
+  }
+  .gui-btn-danger {
+    background: rgba(248,81,73,0.12); border-color: #f85149; color: #ff7b72;
+  }
+  .gui-btn-danger:hover {
+    background: rgba(248,81,73,0.25); border-color: #ff7b72; color: #fff;
+  }
+  .gui-btn-sm.gui-btn-success {
+    background: rgba(63,185,80,0.15); border-color: #3fb950; color: #56d364;
+  }
+  .gui-btn-sm.gui-btn-success:hover {
+    background: rgba(63,185,80,0.28); color: #fff;
+  }
   .receipt-print {
     display: none; position: fixed; inset: 0; z-index: 200;
-    background: #fff; color: #000; padding: 24px;
-    font-family: 'IBM Plex Mono', monospace; overflow: auto;
+    background: rgba(0,0,0,0.55); color: #000;
+    font-family: 'IBM Plex Mono', 'Courier New', monospace;
+    overflow: auto; padding: 24px 12px;
   }
-  .receipt-print.show { display: block; }
+  .receipt-print.show { display: flex; justify-content: center; align-items: flex-start; }
+  .receipt-print .slip-sheet {
+    background: #fff; width: 105mm; max-width: 100%;
+    min-height: 148mm; padding: 10mm 8mm;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.35);
+    color: #111; font-size: 11px; line-height: 1.45;
+  }
+  .receipt-print .slip-actions {
+    text-align: center; margin-top: 12px;
+  }
+  .receipt-print .slip-actions button {
+    font-family: inherit; margin: 0 4px; padding: 8px 16px;
+    cursor: pointer; border: 1px solid #333; background: #f5f5f5;
+  }
+  .slip-hr { border: none; border-top: 1px dashed #333; margin: 8px 0; }
+  .slip-center { text-align: center; }
+  .slip-row { display: flex; justify-content: space-between; gap: 8px; margin: 2px 0; }
+  .slip-amt { font-size: 16px; font-weight: 700; text-align: center; margin: 10px 0; }
+  .slip-muted { font-size: 9px; color: #444; }
   @media print {
+    @page { size: 105mm 148mm; margin: 6mm; }
+    html, body { background: #fff !important; }
     body > *:not(.receipt-print) { display: none !important; }
-    .receipt-print { display: block !important; position: static; }
+    .receipt-print {
+      display: block !important; position: static !important;
+      background: #fff !important; padding: 0 !important;
+      inset: auto !important;
+    }
+    .receipt-print .slip-sheet {
+      box-shadow: none !important; width: 100% !important;
+      min-height: auto !important; padding: 0 !important;
+    }
+    .receipt-print .slip-actions { display: none !important; }
+  }
+  .gui-quick {
+    display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px;
+  }
+  .gui-hint {
+    color: var(--muted); font-size: 11px; margin: 6px 0 10px;
   }
 </style>
 </head>
@@ -269,25 +341,18 @@
     <button class="gui-tab" data-tab="finance">FINANCE</button>
     <button class="gui-tab" data-tab="tx">TRANSACTIONS</button>
     <button class="gui-tab" data-tab="report">REPORTS</button>
-    <button class="gui-tab" data-tab="tools">TOOLS</button>
     <button class="gui-tab" data-tab="auth">AUTH</button>
     <button class="gui-tab" data-tab="vault">VAULT</button>
+    <button class="gui-tab" data-tab="score">5C</button>
+    <button class="gui-tab" data-tab="settings">SETTINGS</button>
   </div>
   <div class="gui-body">
     <div class="gui-panel active" id="gui-panel-dash">
+      <div class="gui-quick" id="dash-quick"></div>
       <div class="gui-grid3" id="dash-stats"></div>
       <div class="chart-wrap" id="dash-charts"></div>
       <div id="dash-sharia-note" style="margin-top:16px;color:var(--cyan-dim)"></div>
       <div id="dash-reminder" style="margin-top:8px;color:var(--amber);font-size:11px"></div>
-      <div style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap">
-        <button class="gui-btn-sm" onclick="document.querySelector('.gui-tab[data-tab=members]').click()">MEMBERS</button>
-        <button class="gui-btn-sm" onclick="document.querySelector('.gui-tab[data-tab=accounts]').click()">ACCOUNTS</button>
-        <button class="gui-btn-sm" onclick="document.querySelector('.gui-tab[data-tab=finance]').click()">FINANCE</button>
-        <button class="gui-btn-sm" onclick="document.querySelector('.gui-tab[data-tab=tx]').click()">TX</button>
-        <button class="gui-btn-sm" onclick="document.querySelector('.gui-tab[data-tab=report]').click()">REPORTS</button>
-        <button class="gui-btn-sm" onclick="document.querySelector('.gui-tab[data-tab=tools]').click()">TOOLS</button>
-        <button class="gui-btn-sm" onclick="document.querySelector('.gui-tab[data-tab=vault]').click()">VAULT</button>
-      </div>
     </div>
     <div class="gui-panel" id="gui-panel-members">
       <div class="gui-search-row">
@@ -315,15 +380,24 @@
           <div class="gui-label" id="lbl-m-addr">ที่อยู่</div>
           <input class="gui-input" id="m-addr" placeholder="Address">
         </div>
+        <div>
+          <div class="gui-label">Status</div>
+          <select class="gui-select" id="m-status">
+            <option value="ACTIVE">ACTIVE</option>
+            <option value="RESIGNED">RESIGNED</option>
+            <option value="SUSPENDED">SUSPENDED</option>
+          </select>
+        </div>
       </div>
       <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
-        <button class="gui-btn" id="btn-m-add" onclick="guiAddMember()">+ Add member</button>
-        <button class="gui-btn" id="btn-m-update" onclick="guiUpdateMember()" style="display:none">Save edit</button>
+        <button class="gui-btn gui-btn-success" id="btn-m-add" onclick="guiAddMember()">+ Add member</button>
+        <button class="gui-btn gui-btn-success" id="btn-m-update" onclick="guiUpdateMember()" style="display:none">Save edit</button>
         <button class="gui-btn-sm gui-btn-danger" id="btn-m-cancel" onclick="guiCancelEdit()" style="display:none">Cancel</button>
       </div>
       <div id="gui-member-list" style="margin-top:12px"></div>
     </div>
     <div class="gui-panel" id="gui-panel-accounts">
+      <p class="gui-hint">เปิดบัญชีแล้วออกสลิปอัตโนมัติ · ปิดบัญชีได้เมื่อยอดเป็น 0</p>
       <div class="gui-grid2">
         <div>
           <div class="gui-label">รหัสสมาชิก *</div>
@@ -343,30 +417,10 @@
         </div>
       </div>
       <button class="gui-btn" onclick="guiOpenAccount()">เปิดบัญชี</button>
-      <div style="margin-top:16px;border-top:1px solid var(--border);padding-top:12px">
-        <div class="gui-label" style="margin-bottom:8px;color:var(--zowe)">ฝาก / ถอน ด่วน</div>
-        <div class="gui-grid3">
-          <div>
-            <div class="gui-label">เลขบัญชี *</div>
-            <input class="gui-input" id="a-tx-acc" placeholder="A001">
-          </div>
-          <div>
-            <div class="gui-label">จำนวนเงิน</div>
-            <input class="gui-input" id="a-tx-amt" type="number" min="0" placeholder="0">
-          </div>
-          <div>
-            <div class="gui-label">หมายเหตุ</div>
-            <input class="gui-input" id="a-tx-note" placeholder="optional">
-          </div>
-        </div>
-        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:4px">
-          <button class="gui-btn" onclick="guiQuickDep()">+ ฝาก (Deposit)</button>
-          <button class="gui-btn-sm" onclick="guiQuickWd()">− ถอน (Withdraw)</button>
-        </div>
-      </div>
       <div id="gui-account-list" style="margin-top:12px"></div>
     </div>
     <div class="gui-panel" id="gui-panel-finance">
+      <p class="gui-hint">ระบุวัตถุประสงค์ทุกครั้ง · ชำระงวดแล้วออกสลิป · กดรายละเอียดเพื่อดูตารางผ่อน</p>
       <div class="gui-grid2">
         <div>
           <div class="gui-label">รหัสสมาชิก *</div>
@@ -398,28 +452,17 @@
           <div class="gui-label">อัตราส่วนแบ่งกำไร (Mudarabah e.g. 70:30)</div>
           <input class="gui-input" id="f-ratio" value="70:30" placeholder="สมาชิก:สหกรณ์">
         </div>
-      </div>
-      <button class="gui-btn" onclick="guiApplyFinance()">ยื่นคำขอสินเชื่อ/การเงิน</button>
-      <div style="margin-top:14px;border-top:1px solid var(--border);padding-top:12px">
-        <div class="gui-label" style="margin-bottom:8px;color:var(--zowe)">อนุมัติ / ชำระ (Approve · Pay)</div>
-        <div class="gui-grid3">
-          <div>
-            <div class="gui-label">รหัสสัญญา *</div>
-            <input class="gui-input" id="f-pay-id" placeholder="F001">
-          </div>
-          <div>
-            <div class="gui-label">จำนวนชำระ</div>
-            <input class="gui-input" id="f-pay-amt" type="number" min="0" placeholder="0">
-          </div>
-          <div style="display:flex;align-items:end;gap:8px;flex-wrap:wrap">
-            <button class="gui-btn" onclick="guiFinanceApprove()" style="margin-top:0">APPROVE</button>
-            <button class="gui-btn-sm" onclick="guiFinancePay()">PAY</button>
-          </div>
+        <div style="grid-column:1/-1">
+          <div class="gui-label">วัตถุประสงค์ / ใช้ทำอะไร *</div>
+          <input class="gui-input" id="f-purpose" placeholder="เช่น ซื้อมอเตอร์ไซค์รับจ้าง · ทุนหมุนร้าน">
         </div>
       </div>
+      <button class="gui-btn gui-btn-warn" onclick="guiApplyFinance()">ยื่นคำขอสินเชื่อ/การเงิน</button>
       <div id="gui-finance-list" style="margin-top:12px"></div>
+      <div id="gui-finance-detail" style="margin-top:12px;font-size:12px;color:var(--text)"></div>
     </div>
     <div class="gui-panel" id="gui-panel-tx">
+      <p class="gui-hint">ฝาก/ถอนแล้วระบบจะเปิดสลิปครึ่ง A4 ให้อัตโนมัติ · กด PRINT ในหน้าต่างสลิป</p>
       <div class="gui-grid2">
         <div>
           <div class="gui-label">เลขบัญชี *</div>
@@ -443,58 +486,12 @@
           <input class="gui-input" id="t-note" placeholder="รายละเอียด">
         </div>
       </div>
-      <button class="gui-btn" onclick="guiDoTx()">ทำรายการ</button>
+      <button class="gui-btn gui-btn-success" onclick="guiDoTx()">ทำรายการ</button>
       <div id="gui-tx-list" style="margin-top:12px"></div>
     </div>
     <div class="gui-panel" id="gui-panel-report">
-      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">
-        <button class="gui-btn" onclick="guiRefreshReport()">รีเฟรชรายงาน</button>
-        <button class="gui-btn-sm" onclick="guiShowSharia()">SHARIA</button>
-        <button class="gui-btn-sm" onclick="guiShowStatus()">STATUS</button>
-      </div>
+      <button class="gui-btn" onclick="guiRefreshReport()">รีเฟรชรายงาน</button>
       <div id="gui-report" style="margin-top:12px;font-size:12px"></div>
-    </div>
-    <div class="gui-panel" id="gui-panel-tools">
-      <div class="stat-box" style="margin-bottom:14px">
-        <div class="lbl">TOOLS · เทียบเท่า CLI</div>
-        <div class="val" style="font-size:13px;font-weight:500">SEED · EXPORT · RESET · MODE · AUDIT</div>
-      </div>
-      <div class="gui-grid2">
-        <div>
-          <div class="gui-label">ข้อมูลตัวอย่าง (SEED)</div>
-          <div style="display:flex;gap:8px;flex-wrap:wrap">
-            <button class="gui-btn" onclick="guiSeed(false)">SEED</button>
-            <button class="gui-btn-sm gui-btn-danger" onclick="guiSeed(true)">SEED FORCE</button>
-          </div>
-          <p style="color:var(--muted);font-size:11px;margin-top:6px">โหลดสมาชิก/บัญชี/สินเชื่อตัวอย่าง — FORCE ทับข้อมูลเดิม</p>
-        </div>
-        <div>
-          <div class="gui-label">ส่งออก / ล้างข้อมูล</div>
-          <div style="display:flex;gap:8px;flex-wrap:wrap">
-            <button class="gui-btn" onclick="guiExport()">EXPORT JSON</button>
-            <button class="gui-btn-sm gui-btn-danger" onclick="guiReset()">RESET CONFIRM</button>
-          </div>
-          <p style="color:var(--muted);font-size:11px;margin-top:6px">EXPORT ไม่รวมรหัส plain · RESET ล้างทั้งหมด (ADMIN)</p>
-        </div>
-        <div>
-          <div class="gui-label">โหมดเก็บข้อมูล (MODE)</div>
-          <div style="display:flex;gap:8px;flex-wrap:wrap">
-            <button class="gui-btn-sm" onclick="guiMode('STATUS')">STATUS</button>
-            <button class="gui-btn-sm" onclick="guiMode('VAULT')">VAULT-ONLY</button>
-            <button class="gui-btn-sm" onclick="guiMode('LOCAL')">LOCAL</button>
-          </div>
-          <p style="color:var(--muted);font-size:11px;margin-top:6px" id="tools-mode-hint">VAULT-ONLY = ไม่เขียน localStorage</p>
-        </div>
-        <div>
-          <div class="gui-label">Audit log</div>
-          <div style="display:flex;gap:8px;flex-wrap:wrap">
-            <button class="gui-btn-sm" onclick="guiAudit(30)">AUDIT 30</button>
-            <button class="gui-btn-sm" onclick="guiAudit(100)">AUDIT 100</button>
-          </div>
-          <p style="color:var(--muted);font-size:11px;margin-top:6px">ดูบันทึกการใช้งานล่าสุด (ต้อง LOGIN)</p>
-        </div>
-      </div>
-      <div id="gui-tools-out" style="margin-top:14px;font-size:12px;color:var(--text);white-space:pre-wrap;font-family:inherit"></div>
     </div>
     <div class="gui-panel" id="gui-panel-auth">
       <div class="stat-box" id="auth-session-box" style="margin-bottom:14px">
@@ -512,37 +509,43 @@
         </div>
       </div>
       <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">
-        <button class="gui-btn" onclick="guiLogin()">LOGIN</button>
+        <button class="gui-btn gui-btn-success" onclick="guiLogin()">LOGIN</button>
         <button class="gui-btn-sm" onclick="guiLogout()">LOGOUT</button>
-        <button class="gui-btn-sm" onclick="guiWho()">WHO</button>
       </div>
       <p id="auth-hint" style="margin-top:12px;color:var(--muted);font-size:12px">
         Demo: admin / admin123 · teller / teller123 · viewer / view123
       </p>
-      <div style="margin-top:16px;border-top:1px solid var(--border);padding-top:12px">
-        <div class="gui-label" style="margin-bottom:8px;color:var(--zowe)">จัดการผู้ใช้ OPS (ADMIN)</div>
+      <hr style="border:none;border-top:1px solid var(--border);margin:16px 0">
+      <div class="gui-label" style="margin-bottom:8px">OPS USER MANAGEMENT (ADMIN)</div>
+      <p class="gui-hint" id="auth-admin-hint">Login as ADMIN to add / edit / reset password / delete users</p>
+      <div id="auth-user-form" style="opacity:0.5;pointer-events:none">
         <div class="gui-grid2">
           <div>
-            <div class="gui-label">Username</div>
-            <input class="gui-input" id="auth-new-user" placeholder="newuser">
+            <div class="gui-label">Username *</div>
+            <input class="gui-input" id="u-username" placeholder="newuser">
           </div>
           <div>
-            <div class="gui-label">Password</div>
-            <input class="gui-input" id="auth-new-pass" type="password" placeholder="min 6 chars">
+            <div class="gui-label">Display name</div>
+            <input class="gui-input" id="u-name" placeholder="ชื่อแสดง">
           </div>
           <div>
             <div class="gui-label">Role</div>
-            <select class="gui-select" id="auth-new-role">
+            <select class="gui-select" id="u-role">
               <option value="TELLER">TELLER</option>
               <option value="VIEW">VIEW</option>
               <option value="ADMIN">ADMIN</option>
             </select>
           </div>
-          <div style="display:flex;align-items:end;gap:8px;flex-wrap:wrap">
-            <button class="gui-btn" onclick="guiUserAdd()" style="margin-top:0">USER ADD</button>
-            <button class="gui-btn-sm" onclick="guiUserPass()">USER PASS</button>
-            <button class="gui-btn-sm gui-btn-danger" onclick="guiUserDel()">USER DEL</button>
+          <div>
+            <div class="gui-label">Password (add / reset)</div>
+            <input class="gui-input" id="u-pass" type="password" placeholder="min 6 chars">
           </div>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">
+          <button class="gui-btn gui-btn-success" onclick="guiUserAdd()">+ Add user</button>
+          <button class="gui-btn gui-btn-success" onclick="guiUserSaveEdit()" id="btn-u-save" style="display:none">Save edit</button>
+          <button class="gui-btn-sm" onclick="guiUserResetPass()">Reset password</button>
+          <button class="gui-btn-sm" onclick="guiUserCancelEdit()" id="btn-u-cancel" style="display:none">Cancel</button>
         </div>
       </div>
       <div id="auth-users-list" style="margin-top:14px"></div>
@@ -563,13 +566,75 @@
         </div>
       </div>
       <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:14px">
-        <button class="gui-btn" onclick="guiVaultSave()">VAULT SAVE</button>
+        <button class="gui-btn gui-btn-success" onclick="guiVaultSave()">VAULT SAVE</button>
         <button class="gui-btn" onclick="guiVaultLoad()">VAULT LOAD</button>
       </div>
       <p id="vault-hint" style="margin-top:12px;color:var(--muted);font-size:12px">
         SAVE opens a system save dialog (Chrome/Edge). LOAD can be repeated anytime.
       </p>
       <div id="vault-msg" style="margin-top:10px;font-size:12px;color:var(--green)"></div>
+    </div>
+    <div class="gui-panel" id="gui-panel-score">
+      <p style="color:var(--muted);font-size:12px;margin-bottom:10px">
+        5C · Character · Capacity · Capital · Collateral · Condition (Islamic coop credit aid)
+      </p>
+      <div class="gui-grid2">
+        <div>
+          <div class="gui-label">Member ID *</div>
+          <input class="gui-input" id="s5-mid" placeholder="M001">
+        </div>
+        <div style="display:flex;align-items:end">
+          <button class="gui-btn" style="margin-top:0" onclick="guiRun5C()">Analyze 5C</button>
+        </div>
+        <div>
+          <div class="gui-label">Character 1-5 (optional override)</div>
+          <input class="gui-input" id="s5-c" type="number" min="1" max="5" placeholder="auto">
+        </div>
+        <div>
+          <div class="gui-label">Capacity 1-5</div>
+          <input class="gui-input" id="s5-cap" type="number" min="1" max="5" placeholder="auto">
+        </div>
+        <div>
+          <div class="gui-label">Capital 1-5</div>
+          <input class="gui-input" id="s5-cap2" type="number" min="1" max="5" placeholder="auto">
+        </div>
+        <div>
+          <div class="gui-label">Collateral 1-5</div>
+          <input class="gui-input" id="s5-col" type="number" min="1" max="5" placeholder="auto">
+        </div>
+        <div>
+          <div class="gui-label">Condition 1-5</div>
+          <input class="gui-input" id="s5-cond" type="number" min="1" max="5" placeholder="auto">
+        </div>
+      </div>
+      <div id="gui-score-result" style="margin-top:14px;font-size:12px"></div>
+    </div>
+    <div class="gui-panel" id="gui-panel-settings">
+      <p class="gui-hint">ข้อมูลสถาบันจะแสดงบนสลิปครึ่ง A4 ทุกใบ · Institution info appears on every slip</p>
+      <div class="gui-grid2">
+        <div style="grid-column:1/-1">
+          <div class="gui-label">ชื่อสถาบัน / Institution name</div>
+          <input class="gui-input" id="set-name" placeholder="สหกรณ์อิสลาม ...">
+        </div>
+        <div>
+          <div class="gui-label">สาขา / Branch</div>
+          <input class="gui-input" id="set-branch" placeholder="สาขา ...">
+        </div>
+        <div>
+          <div class="gui-label">โทร / Phone</div>
+          <input class="gui-input" id="set-phone" placeholder="0xx-xxx-xxxx">
+        </div>
+        <div style="grid-column:1/-1">
+          <div class="gui-label">ที่อยู่ / Address</div>
+          <input class="gui-input" id="set-address" placeholder="ที่อยู่เต็ม">
+        </div>
+        <div style="grid-column:1/-1">
+          <div class="gui-label">อีเมล / Email</div>
+          <input class="gui-input" id="set-email" placeholder="info@example.com">
+        </div>
+      </div>
+      <button class="gui-btn gui-btn-success" onclick="guiSaveSettings()">Save settings</button>
+      <div id="set-msg" style="margin-top:10px;font-size:12px;color:var(--green)"></div>
     </div>
   </div>
 </div>
@@ -590,6 +655,10 @@ let DB = {
   audit: [], // {ts, user, role, action, detail}
   settings: {
     coopName: 'สหกรณ์อิสลาม ALGOR',
+    address: '',
+    phone: '',
+    email: '',
+    branch: '',
     currency: 'THB',
     lang: 'th',
     nextMemberId: 1,
@@ -600,7 +669,7 @@ let DB = {
     lastVaultSave: null,
     vaultOnly: false // if true: do not write localStorage
   },
-  meta: { created: new Date().toISOString(), version: '1.2' }
+  meta: { created: new Date().toISOString(), version: '1.3' }
 };
 
 // Session (memory only)
@@ -683,7 +752,8 @@ function loadDB() {
 function ensureDBShape() {
   if (!DB.settings) DB.settings = {};
   const def = {
-    coopName: 'สหกรณ์อิสลาม ALGOR', currency: 'THB', lang: 'th',
+    coopName: 'สหกรณ์อิสลาม ALGOR', address: '', phone: '', email: '', branch: '',
+    currency: 'THB', lang: 'th',
     nextMemberId: 1, nextAccountId: 1, nextFinanceId: 1, nextTxId: 1,
     vaultRemindMin: 30, lastVaultSave: null, vaultOnly: false
   };
@@ -1145,38 +1215,304 @@ function startVaultReminder() {
   }, 60000);
 }
 
-// ── Receipt / Slip ───────────────────────────────────────
-function showReceipt(html) {
+// ── Receipt / Slip (half A4 portrait ~105×148mm) ─────────
+function instHeaderHtml() {
+  const s = DB.settings || {};
+  const lines = [];
+  lines.push(`<div class="slip-center" style="font-size:13px;font-weight:700">${escapeHtml(s.coopName || 'ALGOR BANK')}</div>`);
+  if (s.branch) lines.push(`<div class="slip-center slip-muted">${escapeHtml(s.branch)}</div>`);
+  if (s.address) lines.push(`<div class="slip-center slip-muted">${escapeHtml(s.address)}</div>`);
+  const contact = [s.phone, s.email].filter(Boolean).join(' · ');
+  if (contact) lines.push(`<div class="slip-center slip-muted">${escapeHtml(contact)}</div>`);
+  return lines.join('');
+}
+function slipShell(bodyHtml) {
+  return `<div class="slip-sheet" id="slip-sheet-active">${bodyHtml}</div>`;
+}
+function showReceipt(html, autoPrint) {
   const box = $('receipt-print');
-  box.innerHTML = html + '<div style="margin-top:20px"><button onclick="window.print()">PRINT</button> <button onclick="closeReceipt()">CLOSE</button></div>';
+  box.innerHTML = html +
+    `<div class="slip-actions">
+      <button type="button" onclick="window.print()">🖨 PRINT</button>
+      <button type="button" onclick="downloadSlipPdf()">⬇ PDF</button>
+      <button type="button" onclick="closeReceipt()">CLOSE</button>
+    </div>`;
   box.classList.add('show');
+  if (autoPrint) setTimeout(() => window.print(), 250);
 }
 function closeReceipt() {
   const box = $('receipt-print');
   box.classList.remove('show');
   box.innerHTML = '';
 }
+
+/** Minimal single-page PDF (image-based) — supports Thai via canvas raster */
+function _pdfEsc(s) { return String(s).replace(/\\/g, '\\\\').replace(/\(/g, '\\(').replace(/\)/g, '\\)'); }
+function buildPdfFromJpeg(jpegBytes, imgW, imgH, pageWmm, pageHmm) {
+  // PDF user unit: 1/72 inch. 1mm = 72/25.4 pt
+  const pt = mm => mm * 72 / 25.4;
+  const pageW = pt(pageWmm);
+  const pageH = pt(pageHmm);
+  // fit image into page with small margin
+  const margin = pt(5);
+  const maxW = pageW - margin * 2;
+  const maxH = pageH - margin * 2;
+  const scale = Math.min(maxW / imgW, maxH / imgH);
+  const drawW = imgW * scale;
+  const drawH = imgH * scale;
+  const ox = (pageW - drawW) / 2;
+  const oy = (pageH - drawH) / 2;
+
+  const encoder = new TextEncoder();
+  const parts = [];
+  const offsets = [];
+  const add = (str) => { parts.push(typeof str === 'string' ? encoder.encode(str) : str); };
+
+  // We'll build with object offsets
+  const chunks = [];
+  const objOffsets = [0]; // 1-based objects
+  let body = '';
+
+  function pushObj(content) {
+    objOffsets.push(null); // placeholder
+    chunks.push({ type: 'obj', content });
+  }
+  function pushStream(dict, bytes) {
+    chunks.push({ type: 'stream', dict, bytes });
+    objOffsets.push(null);
+  }
+
+  pushObj('1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n');
+  pushObj('2 0 obj\n<< /Type /Pages /Kids [3 0 R] /Count 1 >>\nendobj\n');
+  pushObj(`3 0 obj\n<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${pageW.toFixed(2)} ${pageH.toFixed(2)}] /Resources << /XObject << /Im0 4 0 R >> >> /Contents 5 0 R >>\nendobj\n`);
+  pushStream(
+    `4 0 obj\n<< /Type /XObject /Subtype /Image /Width ${imgW} /Height ${imgH} /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ${jpegBytes.length} >>\nstream\n`,
+    jpegBytes
+  );
+  const contentStream = `q\n${drawW.toFixed(2)} 0 0 ${drawH.toFixed(2)} ${ox.toFixed(2)} ${oy.toFixed(2)} cm\n/Im0 Do\nQ\n`;
+  const contentBytes = encoder.encode(contentStream);
+  pushStream(
+    `5 0 obj\n<< /Length ${contentBytes.length} >>\nstream\n`,
+    contentBytes
+  );
+
+  // assemble with xref
+  const out = [];
+  let offset = 0;
+  const write = (u8) => { out.push(u8); offset += u8.length; };
+  const writeStr = (s) => write(encoder.encode(s));
+
+  writeStr('%PDF-1.4\n');
+  const xref = [0];
+  let objNum = 0;
+  for (const ch of chunks) {
+    objNum++;
+    xref.push(offset);
+    if (ch.type === 'obj') {
+      writeStr(ch.content);
+    } else {
+      writeStr(ch.dict);
+      write(ch.bytes instanceof Uint8Array ? ch.bytes : new Uint8Array(ch.bytes));
+      writeStr('\nendstream\nendobj\n');
+    }
+  }
+  const xrefStart = offset;
+  writeStr(`xref\n0 ${xref.length}\n`);
+  writeStr('0000000000 65535 f \n');
+  for (let i = 1; i < xref.length; i++) {
+    writeStr(String(xref[i]).padStart(10, '0') + ' 00000 n \n');
+  }
+  writeStr(`trailer\n<< /Size ${xref.length} /Root 1 0 R >>\nstartxref\n${xrefStart}\n%%EOF\n`);
+
+  // concat
+  let total = 0;
+  out.forEach(u => total += u.length);
+  const pdf = new Uint8Array(total);
+  let p = 0;
+  out.forEach(u => { pdf.set(u, p); p += u.length; });
+  return pdf;
+}
+
+function canvasToJpegUint8(canvas, quality) {
+  const dataUrl = canvas.toDataURL('image/jpeg', quality || 0.92);
+  const b64 = dataUrl.split(',')[1];
+  const bin = atob(b64);
+  const bytes = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+  return bytes;
+}
+
+async function renderSlipToCanvas(sheet) {
+  // Clone with inline-friendly box for rasterization
+  const w = Math.max(sheet.offsetWidth || 400, 360);
+  const h = Math.max(sheet.scrollHeight || 520, 480);
+  const scale = 2;
+  const canvas = document.createElement('canvas');
+  canvas.width = Math.round(w * scale);
+  canvas.height = Math.round(h * scale);
+  const ctx = canvas.getContext('2d');
+  ctx.scale(scale, scale);
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0, 0, w, h);
+
+  // Draw via SVG foreignObject so Thai text uses browser fonts
+  const clone = sheet.cloneNode(true);
+  clone.style.width = w + 'px';
+  clone.style.minHeight = h + 'px';
+  clone.style.background = '#fff';
+  clone.style.color = '#111';
+  clone.style.fontFamily = "Tahoma,'IBM Plex Mono',monospace";
+  clone.style.padding = '12px';
+  clone.style.boxSizing = 'border-box';
+
+  const css = `
+    .slip-sheet{font-family:Tahoma,'IBM Plex Mono',monospace;font-size:11px;line-height:1.45;color:#111;background:#fff;width:100%;box-sizing:border-box;padding:12px;}
+    .slip-center{text-align:center;}
+    .slip-muted{font-size:9px;color:#444;}
+    .slip-hr{border:none;border-top:1px dashed #333;margin:8px 0;}
+    .slip-row{display:flex;justify-content:space-between;gap:8px;margin:2px 0;}
+    .slip-amt{font-size:16px;font-weight:700;text-align:center;margin:10px 0;}
+  `;
+  const svg = `<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}">
+  <foreignObject width="100%" height="100%">
+    <div xmlns="http://www.w3.org/1999/xhtml">
+      <style>${css}</style>
+      ${clone.outerHTML}
+    </div>
+  </foreignObject>
+</svg>`;
+  const blob = new Blob([svg], { type: 'image/svg+xml;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  try {
+    await new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => {
+        try {
+          ctx.drawImage(img, 0, 0, w, h);
+          resolve();
+        } catch (e) { reject(e); }
+      };
+      img.onerror = () => reject(new Error('SVG render failed'));
+      img.src = url;
+    });
+  } catch (err) {
+    // Fallback: plain text lines (still works offline)
+    ctx.fillStyle = '#111';
+    ctx.font = '12px Tahoma, monospace';
+    const lines = (sheet.innerText || '').split(/\n/).map(l => l.trim()).filter(Boolean);
+    let y = 20;
+    lines.forEach(line => {
+      const chunks = [];
+      let rest = line;
+      while (rest.length > 48) {
+        chunks.push(rest.slice(0, 48));
+        rest = rest.slice(48);
+      }
+      chunks.push(rest);
+      chunks.forEach(c => { ctx.fillText(c, 16, y); y += 16; });
+    });
+  } finally {
+    URL.revokeObjectURL(url);
+  }
+  return canvas;
+}
+
+async function downloadSlipPdf() {
+  const sheet = document.getElementById('slip-sheet-active');
+  if (!sheet) {
+    alert(isEn() ? 'No slip to export' : 'ไม่พบสลิป');
+    return;
+  }
+  try {
+    print(isEn() ? 'Generating PDF...' : 'กำลังสร้าง PDF...', 'system');
+    const canvas = await renderSlipToCanvas(sheet);
+    const jpeg = canvasToJpegUint8(canvas, 0.93);
+    // half A4 portrait mm
+    const pdfBytes = buildPdfFromJpeg(jpeg, canvas.width, canvas.height, 105, 148);
+    const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+    const a = document.createElement('a');
+    const fname = `algor-slip-${new Date().toISOString().slice(0, 19).replace(/[:T]/g, '-')}.pdf`;
+    a.href = URL.createObjectURL(blob);
+    a.download = fname;
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+    print(`✓ PDF → ${fname}`, 'ok');
+    audit('SLIP_PDF', fname);
+  } catch (e) {
+    console.error(e);
+    print((isEn() ? 'PDF failed: ' : 'สร้าง PDF ไม่สำเร็จ: ') + e.message, 'error');
+    print(isEn() ? 'Fallback: use PRINT → Save as PDF' : 'ทางเลือก: กด PRINT แล้วเลือก Save as PDF', 'system');
+  }
+}
+function typeLabel(type) {
+  const mapTh = { DEPOSIT: 'ฝากเงิน', WITHDRAW: 'ถอนเงิน', OPEN: 'เปิดบัญชี', FIN_PAY: 'ชำระสินเชื่อ', PROFIT: 'แบ่งกำไร', FEE: 'ค่าธรรมเนียม' };
+  const mapEn = { DEPOSIT: 'DEPOSIT', WITHDRAW: 'WITHDRAW', OPEN: 'OPEN ACCOUNT', FIN_PAY: 'FINANCE PAYMENT', PROFIT: 'PROFIT SHARE', FEE: 'FEE' };
+  return isEn() ? (mapEn[type] || type) : (mapTh[type] || type);
+}
 function buildTxReceipt(tx) {
   const acc = DB.accounts.find(a => a.id === tx.accountId);
   const mem = acc ? DB.members.find(m => m.id === acc.memberId) : null;
-  const title = isEn() ? 'TRANSACTION RECEIPT' : 'ใบเสร็จรายการ';
-  return `
-    <div style="max-width:400px;margin:0 auto;border:1px dashed #333;padding:16px">
-      <h2 style="text-align:center;margin:0 0 8px">${DB.settings.coopName}</h2>
-      <div style="text-align:center;font-size:12px;margin-bottom:12px">${title}</div>
-      <hr>
-      <p><b>No:</b> ${tx.id}</p>
-      <p><b>Date:</b> ${tx.at}</p>
-      <p><b>Account:</b> ${tx.accountId} ${acc ? '(' + acc.type + ')' : ''}</p>
-      <p><b>Member:</b> ${mem ? mem.name : '-'} ${mem ? mem.id : ''}</p>
-      <p><b>Type:</b> ${tx.type}</p>
-      <p style="font-size:18px"><b>Amount:</b> ${fmtMoney(tx.amount)} THB</p>
-      <p><b>Note:</b> ${tx.note || '-'}</p>
-      <p><b>Balance after:</b> ${acc ? fmtMoney(acc.balance) : '-'} THB</p>
-      <hr>
-      <p style="font-size:10px;text-align:center">ALGOR BANK · Sharia-compliant · No Riba</p>
-      <p style="font-size:10px;text-align:center">${sessionUser ? sessionUser.username : 'system'}</p>
-    </div>`;
+  const title = typeLabel(tx.type);
+  const body = `
+    ${instHeaderHtml()}
+    <div class="slip-center" style="margin-top:6px;font-weight:600">${title}</div>
+    <div class="slip-center slip-muted">${isEn() ? 'Official slip · half A4' : 'สลิปทางการ · ครึ่ง A4 แนวตั้ง'}</div>
+    <hr class="slip-hr">
+    <div class="slip-row"><span>${isEn()?'No':'เลขที่'}</span><span>${escapeHtml(tx.id)}</span></div>
+    <div class="slip-row"><span>${isEn()?'Date':'วันที่'}</span><span>${escapeHtml((tx.at || '').replace('T',' ').slice(0,19))}</span></div>
+    <div class="slip-row"><span>${isEn()?'Account':'บัญชี'}</span><span>${escapeHtml(tx.accountId)}${acc ? ' (' + acc.type + ')' : ''}</span></div>
+    <div class="slip-row"><span>${isEn()?'Member':'สมาชิก'}</span><span>${escapeHtml(mem ? mem.name : '-')} ${mem ? escapeHtml(mem.id) : ''}</span></div>
+    <div class="slip-row"><span>${isEn()?'Type':'ประเภท'}</span><span>${escapeHtml(title)}</span></div>
+    <div class="slip-amt">${fmtMoney(tx.amount)} THB</div>
+    <div class="slip-row"><span>${isEn()?'Note':'หมายเหตุ'}</span><span>${escapeHtml(tx.note || '-')}</span></div>
+    <div class="slip-row"><span>${isEn()?'Balance after':'ยอดหลังทำรายการ'}</span><span>${acc ? fmtMoney(acc.balance) : '-'} THB</span></div>
+    <hr class="slip-hr">
+    <div class="slip-center slip-muted">Sharia · No Riba · algor-bank</div>
+    <div class="slip-center slip-muted">${isEn()?'Officer':'เจ้าหน้าที่'}: ${escapeHtml(sessionUser ? sessionUser.username : 'system')}</div>
+    <div class="slip-center slip-muted" style="margin-top:12px">${isEn()?'Member sign':'ลายเซ็นสมาชิก'} _____________</div>
+  `;
+  return slipShell(body);
+}
+function buildAccountOpenReceipt(acc) {
+  const mem = DB.members.find(m => m.id === acc.memberId);
+  const body = `
+    ${instHeaderHtml()}
+    <div class="slip-center" style="margin-top:6px;font-weight:600">${typeLabel('OPEN')}</div>
+    <hr class="slip-hr">
+    <div class="slip-row"><span>${isEn()?'Account':'เลขบัญชี'}</span><span>${escapeHtml(acc.id)}</span></div>
+    <div class="slip-row"><span>${isEn()?'Date':'วันที่'}</span><span>${escapeHtml(acc.opened)}</span></div>
+    <div class="slip-row"><span>${isEn()?'Member':'สมาชิก'}</span><span>${escapeHtml(mem ? mem.name : '-')} ${escapeHtml(acc.memberId)}</span></div>
+    <div class="slip-row"><span>${isEn()?'Type':'ประเภท'}</span><span>${escapeHtml(acc.type)}</span></div>
+    <div class="slip-amt">${fmtMoney(acc.balance)} THB</div>
+    <div class="slip-row"><span>${isEn()?'Status':'สถานะ'}</span><span>${escapeHtml(acc.status)}</span></div>
+    <hr class="slip-hr">
+    <div class="slip-center slip-muted">Sharia · No Riba · algor-bank</div>
+    <div class="slip-center slip-muted">${isEn()?'Officer':'เจ้าหน้าที่'}: ${escapeHtml(sessionUser ? sessionUser.username : 'system')}</div>
+  `;
+  return slipShell(body);
+}
+function buildFinancePayReceipt(f, payAmt, payNo) {
+  const mem = DB.members.find(m => m.id === f.memberId);
+  const body = `
+    ${instHeaderHtml()}
+    <div class="slip-center" style="margin-top:6px;font-weight:600">${typeLabel('FIN_PAY')}</div>
+    <hr class="slip-hr">
+    <div class="slip-row"><span>${isEn()?'Contract':'สัญญา'}</span><span>${escapeHtml(f.id)}</span></div>
+    <div class="slip-row"><span>${isEn()?'Date':'วันที่'}</span><span>${new Date().toISOString().replace('T',' ').slice(0,19)}</span></div>
+    <div class="slip-row"><span>${isEn()?'Member':'สมาชิก'}</span><span>${escapeHtml(mem ? mem.name : '-')} ${escapeHtml(f.memberId)}</span></div>
+    <div class="slip-row"><span>${isEn()?'Product':'ผลิตภัณฑ์'}</span><span>${escapeHtml(f.product)}</span></div>
+    <div class="slip-row"><span>${isEn()?'Purpose':'วัตถุประสงค์'}</span><span>${escapeHtml((f.purpose || '-').slice(0,40))}</span></div>
+    <div class="slip-row"><span>${isEn()?'Installment #':'งวดที่'}</span><span>${payNo || '-'}</span></div>
+    <div class="slip-amt">${fmtMoney(payAmt)} THB</div>
+    <div class="slip-row"><span>${isEn()?'Paid total':'ชำระสะสม'}</span><span>${fmtMoney(f.paid)} THB</span></div>
+    <div class="slip-row"><span>${isEn()?'Remaining':'คงเหลือ'}</span><span>${fmtMoney(f.remaining)} THB</span></div>
+    <div class="slip-row"><span>${isEn()?'Status':'สถานะ'}</span><span>${escapeHtml(f.status)}</span></div>
+    <hr class="slip-hr">
+    <div class="slip-center slip-muted">Sharia · No Riba · algor-bank</div>
+    <div class="slip-center slip-muted">${isEn()?'Officer':'เจ้าหน้าที่'}: ${escapeHtml(sessionUser ? sessionUser.username : 'system')}</div>
+  `;
+  return slipShell(body);
 }
 
 // ── CSV import ───────────────────────────────────────────
@@ -1242,11 +1578,13 @@ register(['HELP', '?'], (args) => {
   print('  MEMBER <รหัส>     ดูรายละเอียดสมาชิก', 'calc');
   print('  MEMBER SEARCH <คำค้น>', 'calc');
   print('  MEMBER EDIT <รหัส> name=... phone=... address=... status=...', 'calc');
+  print('  MEMBER DEL <รหัส>        ลบสมาชิก (ถ้ายอดไม่ค้าง)', 'calc');
   print('');
   print('── บัญชี (Accounts) ──', 'menu');
   print('  ACCOUNT OPEN <รหัสสมาชิก> <SAVINGS|SHARE|INVEST> [ยอดเริ่ม]', 'calc');
   print('  ACCOUNT LIST / ACCOUNTS', 'calc');
   print('  ACCOUNT <เลขบัญชี>  ดูรายละเอียด', 'calc');
+  print('  ACCOUNT CLOSE/EDIT/DEL <เลข>  ปิด/แก้/ลบบัญชี', 'calc');
   print('  BALANCE <เลขบัญชี>', 'calc');
   print('');
   print('── รายการ (Transactions) ──', 'menu');
@@ -1259,7 +1597,10 @@ register(['HELP', '?'], (args) => {
   print('  FINANCE LIST / FINANCE', 'calc');
   print('  FINANCE <รหัส>', 'calc');
   print('  FINANCE APPROVE <รหัส>', 'calc');
-  print('  FINANCE PAY <รหัส> <จำนวน>', 'calc');
+  print('  FINANCE PAY <รหัส> <จำนวน> [หมายเหตุ]', 'calc');
+  print('  FINANCE SCHEDULE <รหัส>  ตารางผ่อน/งวดคงเหลือ', 'calc');
+  print('  FINANCE EDIT/DEL <รหัส>  แก้วัตถุประสงค์/ลบ', 'calc');
+  print('  5C <รหัสสมาชิก>          ประเมินสินเชื่อ 5C', 'calc');
   print('');
   print('── รายงาน ──', 'menu');
   print('  REPORT / REPORT SUMMARY', 'calc');
@@ -1488,6 +1829,26 @@ register(['MEMBER', 'MEMBERS', 'MEM'], (args) => {
     print(`  ${m.name} · ${m.phone || '-'} · ${m.address || '-'} · ${m.status}`, 'member');
     return;
   }
+  if (sub === 'DEL' || sub === 'DELETE' || sub === 'RM') {
+    const mid = (args[1] || '').toUpperCase();
+    if (!mid) { print(isEn() ? 'MEMBER DEL <id>' : 'MEMBER DEL <รหัส>', 'error'); return; }
+    const idx = DB.members.findIndex(x => x.id === mid);
+    if (idx < 0) { print(isEn() ? 'Member not found' : 'ไม่พบสมาชิก', 'error'); return; }
+    const hasAcc = DB.accounts.some(a => a.memberId === mid && a.status === 'ACTIVE' && a.balance > 0);
+    const hasFin = DB.finances.some(f => f.memberId === mid && (f.status === 'ACTIVE' || f.status === 'PENDING') && f.remaining > 0);
+    if (hasAcc || hasFin) {
+      print(isEn()
+        ? 'Member has active balance/finance — close accounts/contracts first or set status=RESIGNED'
+        : 'สมาชิกมียอดบัญชี/สินเชื่อค้าง — ปิดบัญชี/สัญญาก่อน หรือ MEMBER EDIT status=RESIGNED', 'warn');
+      return;
+    }
+    const name = DB.members[idx].name;
+    DB.members.splice(idx, 1);
+    saveDB();
+    audit('MEMBER_DEL', mid);
+    print(`✓ ${isEn() ? 'Deleted member' : 'ลบสมาชิก'} ${mid} (${name})`, 'ok');
+    return;
+  }
   // MEMBER <id>
   const m = DB.members.find(x => x.id.toUpperCase() === sub);
   if (!m) { print((isEn() ? 'Member not found: ' : 'ไม่พบสมาชิก ') + sub, 'error'); return; }
@@ -1543,20 +1904,77 @@ register(['ACCOUNT', 'ACCOUNTS', 'ACC'], (args) => {
       status: 'ACTIVE'
     };
     DB.accounts.push(a);
-    if (bal > 0) addTxInternal(a.id, 'DEPOSIT', bal, 'เปิดบัญชี');
+    if (bal > 0) addTxInternal(a.id, 'DEPOSIT', bal, isEn() ? 'Open account' : 'เปิดบัญชี');
     saveDB();
+    audit('ACC_OPEN', a.id);
     print(`✓ เปิดบัญชี ${a.id} ประเภท ${type} สำหรับ ${mem.name} ยอด ${fmtMoney(bal)}`, 'ok');
+    showReceipt(buildAccountOpenReceipt(a), false);
+    return;
+  }
+  if (sub === 'CLOSE' || sub === 'EDIT' || sub === 'UPDATE') {
+    const aid = (args[1] || '').toUpperCase();
+    if (!aid) {
+      print(isEn() ? 'ACCOUNT CLOSE <id> | ACCOUNT EDIT <id> status=ACTIVE|CLOSED' : 'ACCOUNT CLOSE <เลขบัญชี> | ACCOUNT EDIT <เลข> status=...', 'error');
+      return;
+    }
+    const a = DB.accounts.find(x => x.id === aid);
+    if (!a) { print(isEn() ? 'Account not found' : 'ไม่พบบัญชี', 'error'); return; }
+    if (sub === 'CLOSE') {
+      if (a.balance > 0) {
+        print(isEn() ? 'Balance must be zero before close' : 'ต้องมียอด 0 ก่อนปิดบัญชี', 'warn');
+        return;
+      }
+      a.status = 'CLOSED';
+      saveDB();
+      audit('ACC_CLOSE', a.id);
+      print(`✓ ${isEn() ? 'Closed' : 'ปิดบัญชี'} ${a.id}`, 'ok');
+      return;
+    }
+    const rest = args.slice(2).join(' ');
+    const pairs = {};
+    const re = /(\w+)=([^=]+?)(?=\s+\w+=|$)/g;
+    let match;
+    while ((match = re.exec(rest)) !== null) pairs[match[1].toLowerCase()] = match[2].trim();
+    if (pairs.status) {
+      const st = pairs.status.toUpperCase();
+      if (!['ACTIVE', 'CLOSED', 'FROZEN'].includes(st)) { print('status: ACTIVE|CLOSED|FROZEN', 'error'); return; }
+      if (st === 'CLOSED' && a.balance > 0) {
+        print(isEn() ? 'Balance must be zero' : 'ต้องมียอด 0 ก่อนปิด', 'warn'); return;
+      }
+      a.status = st;
+    }
+    saveDB();
+    audit('ACC_EDIT', a.id);
+    print(`✓ ${isEn() ? 'Updated' : 'แก้ไขแล้ว'} ${a.id} · ${a.status}`, 'ok');
+    return;
+  }
+  if (sub === 'DEL' || sub === 'DELETE' || sub === 'RM') {
+    const aid = (args[1] || '').toUpperCase();
+    if (!aid) { print('ACCOUNT DEL <id>', 'error'); return; }
+    const idx = DB.accounts.findIndex(x => x.id === aid);
+    if (idx < 0) { print(isEn() ? 'Not found' : 'ไม่พบบัญชี', 'error'); return; }
+    const a = DB.accounts[idx];
+    if (a.balance > 0 || a.status === 'ACTIVE') {
+      print(isEn()
+        ? 'Withdraw to zero and CLOSE first, or ACCOUNT CLOSE'
+        : 'ถอนให้เหลือ 0 แล้ว CLOSE ก่อน', 'warn');
+      return;
+    }
+    DB.accounts.splice(idx, 1);
+    saveDB();
+    audit('ACC_DEL', aid);
+    print(`✓ ${isEn() ? 'Deleted account' : 'ลบบัญชี'} ${aid}`, 'ok');
     return;
   }
   const a = DB.accounts.find(x => x.id.toUpperCase() === sub);
-  if (!a) { print('ไม่พบบัญชี ' + sub, 'error'); return; }
+  if (!a) { print((isEn() ? 'Account not found: ' : 'ไม่พบบัญชี ') + sub, 'error'); return; }
   const mem = DB.members.find(m => m.id === a.memberId);
-  print(`═══ บัญชี ${a.id} ═══`, 'menu');
-  print(`  สมาชิก  : ${a.memberId} (${mem ? mem.name : '?'})`, 'member');
-  print(`  ประเภท  : ${a.type}`, 'calc');
-  print(`  ยอดเงิน : ${fmtMoney(a.balance)} บาท`, 'money');
-  print(`  เปิดเมื่อ: ${a.opened}`, 'calc');
-  print(`  สถานะ   : ${a.status}`, 'ok');
+  print(`═══ ${isEn() ? 'Account' : 'บัญชี'} ${a.id} ═══`, 'menu');
+  print(`  ${isEn() ? 'Member' : 'สมาชิก'}  : ${a.memberId} (${mem ? mem.name : '?'})`, 'member');
+  print(`  ${isEn() ? 'Type' : 'ประเภท'}  : ${a.type}`, 'calc');
+  print(`  ${isEn() ? 'Balance' : 'ยอดเงิน'} : ${fmtMoney(a.balance)} THB`, 'money');
+  print(`  ${isEn() ? 'Opened' : 'เปิดเมื่อ'}: ${a.opened}`, 'calc');
+  print(`  ${isEn() ? 'Status' : 'สถานะ'}   : ${a.status}`, 'ok');
 });
 
 register(['BALANCE', 'BAL'], (args) => {
@@ -1583,7 +2001,10 @@ register(['DEPOSIT', 'DEP'], (args) => {
   saveDB();
   audit('DEPOSIT', a.id + ' ' + amount);
   print(`✓ ฝาก ${fmtMoney(amount)} เข้า ${a.id} · ยอดใหม่ ${fmtMoney(a.balance)}`, 'ok');
-  if (txDep) print(`  RECEIPT ${txDep.id}  — print slip`, 'system');
+  if (txDep) {
+    print(`  RECEIPT ${txDep.id}`, 'system');
+    showReceipt(buildTxReceipt(txDep), false);
+  }
 });
 
 register(['WITHDRAW', 'WD'], (args) => {
@@ -1602,7 +2023,10 @@ register(['WITHDRAW', 'WD'], (args) => {
   saveDB();
   audit('WITHDRAW', a.id + ' ' + amount);
   print(`✓ ถอน ${fmtMoney(amount)} จาก ${a.id} · ยอดใหม่ ${fmtMoney(a.balance)}`, 'ok');
-  if (txWd) print(`  RECEIPT ${txWd.id}  — print slip`, 'system');
+  if (txWd) {
+    print(`  RECEIPT ${txWd.id}`, 'system');
+    showReceipt(buildTxReceipt(txWd), false);
+  }
 });
 
 register(['TX', 'TRANSACTION'], (args) => {
@@ -1620,6 +2044,79 @@ register(['TX', 'TRANSACTION'], (args) => {
   }
 });
 
+// ── Finance helpers ──────────────────────────────────────
+function financeMonthly(f) {
+  const months = Math.max(1, parseInt(f.months, 10) || 12);
+  const total = Number(f.totalPayable) || 0;
+  return total / months;
+}
+function financePaidInstallments(f) {
+  if (Array.isArray(f.payments) && f.payments.length) return f.payments.length;
+  const m = financeMonthly(f);
+  if (m <= 0) return 0;
+  return Math.floor((Number(f.paid) || 0) / m + 1e-9);
+}
+function financeRemainInstallments(f) {
+  const months = Math.max(1, parseInt(f.months, 10) || 12);
+  const paidN = financePaidInstallments(f);
+  if ((Number(f.remaining) || 0) <= 0) return 0;
+  return Math.max(0, months - paidN);
+}
+function ensureFinanceShape(f) {
+  if (!Array.isArray(f.payments)) f.payments = [];
+  if (f.purpose === undefined) f.purpose = f.note || '';
+  if (f.monthlyInstallment === undefined) f.monthlyInstallment = financeMonthly(f);
+  return f;
+}
+function printFinanceDetail(f) {
+  ensureFinanceShape(f);
+  const mem = DB.members.find(m => m.id === f.memberId);
+  const monthly = financeMonthly(f);
+  const paidN = financePaidInstallments(f);
+  const remainN = financeRemainInstallments(f);
+  const months = Math.max(1, parseInt(f.months, 10) || 12);
+  print(`═══ ${isEn() ? 'Contract' : 'สัญญา'} ${f.id} ═══`, 'menu');
+  print(`  ${isEn() ? 'Member' : 'สมาชิก'}    : ${f.memberId} (${mem ? mem.name : '?'})`, 'member');
+  print(`  ${isEn() ? 'Product' : 'ผลิตภัณฑ์'} : ${f.product}`, 'calc');
+  if (PRODUCT_DESC[f.product]) print(`  ${PRODUCT_DESC[f.product]}`, 'system');
+  print(`  ${isEn() ? 'Purpose' : 'วัตถุประสงค์'} : ${f.purpose || f.note || '-'}`, 'algor');
+  print(`  ${isEn() ? 'Principal' : 'จำนวนต้น'}  : ${fmtMoney(f.amount)}`, 'money');
+  print(`  ${isEn() ? 'Total due' : 'รวมชำระ'}   : ${fmtMoney(f.totalPayable)}`, 'money');
+  print(`  ${isEn() ? 'Paid' : 'ชำระแล้ว'}  : ${fmtMoney(f.paid)}`, 'ok');
+  print(`  ${isEn() ? 'Remaining' : 'คงเหลือ'}   : ${fmtMoney(f.remaining)}`, 'money');
+  print(`  ${isEn() ? 'Term' : 'ระยะเวลา'}  : ${months} ${isEn() ? 'months' : 'เดือน'}`, 'calc');
+  print(`  ${isEn() ? 'Installment' : 'ค่างวด/เดือน'} : ${fmtMoney(monthly)}`, 'money');
+  print(`  ${isEn() ? 'Paid installments' : 'งวดที่ชำระแล้ว'} : ${paidN} / ${months}`, 'ok');
+  print(`  ${isEn() ? 'Remaining installments' : 'งวดคงเหลือ'} : ${remainN}`, 'calc');
+  if (f.margin) print(`  ${isEn() ? 'Margin' : 'อัตรากำไร'} : ${f.margin}%`, 'calc');
+  if (f.ratio && (f.product === 'MUDARABAH' || f.product === 'MUSHARAKAH')) print(`  ${isEn() ? 'Ratio' : 'สัดส่วน'}   : ${f.ratio}`, 'calc');
+  print(`  ${isEn() ? 'Status' : 'สถานะ'}     : ${f.status}`, 'ok');
+  print(`  ${isEn() ? 'Applied' : 'ยื่นเมื่อ'}  : ${f.applied} · ${isEn() ? 'Approved' : 'อนุมัติ'}: ${f.approved || '-'}`, 'system');
+  if (f.payments && f.payments.length) {
+    print(isEn() ? '  Payment history:' : '  ประวัติชำระ:', 'system');
+    f.payments.slice().reverse().slice(0, 12).forEach(p => {
+      print(`    #${p.no || '-'}  ${fmtMoney(p.amount)}  ${ (p.at || '').slice(0, 16) }  ${p.note || ''}`, 'calc');
+    });
+  }
+  // simple schedule preview
+  print(isEn() ? '  Schedule (equal installment model):' : '  ตารางผ่อน (แบบงวดเท่ากัน):', 'system');
+  let remain = Number(f.totalPayable) || 0;
+  const alreadyPaid = Number(f.paid) || 0;
+  let cursor = alreadyPaid;
+  for (let i = 1; i <= months; i++) {
+    const due = Math.min(monthly, Math.max(0, (Number(f.totalPayable) || 0) - monthly * (i - 1)));
+    let st = 'PENDING';
+    if (cursor >= monthly * i - 1e-6) st = 'PAID';
+    else if (cursor > monthly * (i - 1)) st = 'PARTIAL';
+    if (f.status === 'CLOSED') st = 'PAID';
+    if (i <= 6 || i > months - 3 || st !== 'PENDING') {
+      print(`    ${String(i).padStart(2)}/${months}  ${fmtMoney(monthly).padStart(12)}  [${st}]`, st === 'PAID' ? 'ok' : 'calc');
+    } else if (i === 7) {
+      print('    ...', 'system');
+    }
+  }
+}
+
 // ── Finance (Sharia products) ────────────────────────────
 const PRODUCT_DESC = {
   MURABAHA: 'Murabaha — ขายผ่อนโดยเปิดเผยต้นทุน+กำไรตกลง (ไม่มีดอกเบี้ย)',
@@ -1632,11 +2129,15 @@ const PRODUCT_DESC = {
 register(['FINANCE', 'FIN', 'LOAN'], (args) => {
   const sub = (args[0] || 'LIST').toUpperCase();
   if (sub === 'LIST' || sub === 'FINANCE') {
-    if (!DB.finances.length) { print('ยังไม่มีคำขอการเงิน', 'warn'); return; }
-    print('═══ สินเชื่อ / สัญญาการเงิน ═══', 'menu');
-    print('รหัส    สมาชิก   ผลิตภัณฑ์      จำนวน        คงเหลือ      สถานะ', 'system');
+    if (!DB.finances.length) { print(isEn() ? 'No finance records' : 'ยังไม่มีคำขอการเงิน', 'warn'); return; }
+    print(isEn() ? '═══ Finance contracts ═══' : '═══ สินเชื่อ / สัญญาการเงิน ═══', 'menu');
+    print(isEn()
+      ? 'ID     Member   Product      Amount       Remain       Term  Status  Purpose'
+      : 'รหัส    สมาชิก   ผลิตภัณฑ์      จำนวน        คงเหลือ      งวด   สถานะ   วัตถุประสงค์', 'system');
     DB.finances.forEach(f => {
-      print(`${f.id.padEnd(7)} ${f.memberId.padEnd(8)} ${f.product.padEnd(12)} ${fmtMoney(f.amount).padStart(12)} ${fmtMoney(f.remaining).padStart(12)}  ${f.status}`, 'calc');
+      ensureFinanceShape(f);
+      const pur = (f.purpose || '-').slice(0, 18);
+      print(`${f.id.padEnd(7)} ${f.memberId.padEnd(8)} ${f.product.padEnd(12)} ${fmtMoney(f.amount).padStart(12)} ${fmtMoney(f.remaining).padStart(12)}  ${String(f.months).padStart(3)}m  ${f.status.padEnd(8)} ${pur}`, 'calc');
     });
     return;
   }
@@ -1644,23 +2145,49 @@ register(['FINANCE', 'FIN', 'LOAN'], (args) => {
     const mid = (args[1] || '').toUpperCase();
     const product = (args[2] || '').toUpperCase();
     const amount = parseFloat(args[3]);
-    const months = parseInt(args[4]) || 12;
+    const months = parseInt(args[4], 10) || 12;
     const extra = args[5] || '';
+    // purpose: everything after product params; if args[5] is number (margin) purpose starts at 6
+    let purpose = '';
+    let marginExtra = extra;
+    if (product === 'MURABAHA' || product === 'IJARAH') {
+      if (extra && isNaN(parseFloat(extra))) {
+        purpose = args.slice(5).join(' ');
+        marginExtra = '';
+      } else {
+        purpose = args.slice(6).join(' ');
+      }
+    } else if (product === 'MUDARABAH' || product === 'MUSHARAKAH') {
+      if (extra && extra.includes(':')) {
+        purpose = args.slice(6).join(' ');
+      } else if (extra && !extra.includes(':')) {
+        purpose = args.slice(5).join(' ');
+        marginExtra = '';
+      }
+    } else {
+      purpose = args.slice(5).join(' ');
+      marginExtra = '';
+    }
     if (!mid || !product || isNaN(amount) || amount <= 0) {
-      print('ใช้: FINANCE APPLY <สมาชิก> <MURABAHA|MUDARABAH|MUSHARAKAH|IJARAH|QARD> <จำนวน> [เดือน] [margin%|ratio]', 'error');
+      print(isEn()
+        ? 'Usage: FINANCE APPLY <member> <MURABAHA|MUDARABAH|MUSHARAKAH|IJARAH|QARD> <amount> [months] [margin%|ratio] [purpose...]'
+        : 'ใช้: FINANCE APPLY <สมาชิก> <MURABAHA|...> <จำนวน> [เดือน] [margin%|ratio] [วัตถุประสงค์...]', 'error');
+      print(isEn()
+        ? '  Ex: FINANCE APPLY M001 MURABAHA 50000 12 5 ซื้อมอเตอร์ไซค์รับจ้าง'
+        : '  ตัวอย่าง: FINANCE APPLY M001 MURABAHA 50000 12 5 ซื้อมอเตอร์ไซค์รับจ้าง', 'system');
       return;
     }
-    if (!PRODUCT_DESC[product]) { print('ผลิตภัณฑ์ไม่ถูกต้อง', 'error'); return; }
+    if (!PRODUCT_DESC[product]) { print(isEn() ? 'Invalid product' : 'ผลิตภัณฑ์ไม่ถูกต้อง', 'error'); return; }
     const mem = DB.members.find(m => m.id === mid);
-    if (!mem) { print('ไม่พบสมาชิก', 'error'); return; }
+    if (!mem) { print(isEn() ? 'Member not found' : 'ไม่พบสมาชิก', 'error'); return; }
 
     let margin = 0, ratio = '70:30', totalPayable = amount;
     if (product === 'MURABAHA' || product === 'IJARAH') {
-      margin = parseFloat(extra) || 5;
+      margin = parseFloat(marginExtra) || 5;
       totalPayable = amount * (1 + margin / 100);
     } else if (product === 'MUDARABAH' || product === 'MUSHARAKAH') {
-      ratio = extra || '70:30';
-      totalPayable = amount; // profit later
+      ratio = (marginExtra && marginExtra.includes(':')) ? marginExtra : '70:30';
+      totalPayable = amount;
     } else if (product === 'QARD') {
       margin = 0;
       totalPayable = amount;
@@ -1677,60 +2204,243 @@ register(['FINANCE', 'FIN', 'LOAN'], (args) => {
       totalPayable,
       remaining: totalPayable,
       paid: 0,
+      monthlyInstallment: totalPayable / Math.max(1, months),
+      purpose: purpose || '',
+      note: purpose || '',
+      payments: [],
       status: 'PENDING',
-      applied: new Date().toISOString().slice(0,10),
-      approved: null,
-      note: ''
+      applied: new Date().toISOString().slice(0, 10),
+      approved: null
     };
     DB.finances.push(f);
     saveDB();
-    print(`✓ ยื่นคำขอ ${f.id} — ${PRODUCT_DESC[product]}`, 'ok');
-    print(`  จำนวน ${fmtMoney(amount)} · รวมที่ต้องชำระโดยประมาณ ${fmtMoney(totalPayable)} · ${months} เดือน`, 'calc');
-    print(`  สถานะ: PENDING — ใช้ FINANCE APPROVE ${f.id} เพื่ออนุมัติ`, 'warn');
+    audit('FIN_APPLY', f.id + ' ' + product + ' ' + (purpose || ''));
+    print(`✓ ${isEn() ? 'Applied' : 'ยื่นคำขอ'} ${f.id} — ${PRODUCT_DESC[product]}`, 'ok');
+    print(`  ${isEn() ? 'Purpose' : 'วัตถุประสงค์'}: ${f.purpose || '-'}`, 'algor');
+    print(`  ${isEn() ? 'Amount' : 'จำนวน'} ${fmtMoney(amount)} · ${isEn() ? 'total due' : 'รวมชำระ'} ${fmtMoney(totalPayable)} · ${months} ${isEn() ? 'months' : 'เดือน'} · ${isEn() ? 'installment' : 'งวดละ'} ${fmtMoney(f.monthlyInstallment)}`, 'calc');
+    print(`  ${isEn() ? 'Status PENDING — FINANCE APPROVE' : 'สถานะ PENDING — ใช้ FINANCE APPROVE'} ${f.id}`, 'warn');
     return;
   }
   if (sub === 'APPROVE') {
     const fid = (args[1] || '').toUpperCase();
     const f = DB.finances.find(x => x.id === fid);
-    if (!f) { print('ไม่พบ', 'error'); return; }
-    if (f.status !== 'PENDING') { print('สถานะไม่ใช่ PENDING', 'warn'); return; }
+    if (!f) { print(isEn() ? 'Not found' : 'ไม่พบ', 'error'); return; }
+    if (f.status !== 'PENDING') { print(isEn() ? 'Not PENDING' : 'สถานะไม่ใช่ PENDING', 'warn'); return; }
     f.status = 'ACTIVE';
-    f.approved = new Date().toISOString().slice(0,10);
+    f.approved = new Date().toISOString().slice(0, 10);
+    ensureFinanceShape(f);
     saveDB();
-    print(`✓ อนุมัติ ${f.id} แล้ว · สถานะ ACTIVE`, 'ok');
+    audit('FIN_APPROVE', f.id);
+    print(`✓ ${isEn() ? 'Approved' : 'อนุมัติ'} ${f.id} · ACTIVE`, 'ok');
     return;
   }
   if (sub === 'PAY') {
     const fid = (args[1] || '').toUpperCase();
     const amt = parseFloat(args[2]);
+    const note = args.slice(3).join(' ') || (isEn() ? 'installment' : 'ชำระค่างวด');
     const f = DB.finances.find(x => x.id === fid);
-    if (!f || isNaN(amt) || amt <= 0) { print('ใช้: FINANCE PAY <รหัส> <จำนวน>', 'error'); return; }
-    if (f.status !== 'ACTIVE' && f.status !== 'APPROVED') { print('สัญญาไม่พร้อมชำระ', 'error'); return; }
+    if (!f || isNaN(amt) || amt <= 0) {
+      print(isEn() ? 'Usage: FINANCE PAY <id> <amount> [note]' : 'ใช้: FINANCE PAY <รหัส> <จำนวน> [หมายเหตุ]', 'error');
+      return;
+    }
+    if (f.status !== 'ACTIVE' && f.status !== 'APPROVED') {
+      print(isEn() ? 'Contract not payable' : 'สัญญาไม่พร้อมชำระ', 'error');
+      return;
+    }
+    ensureFinanceShape(f);
     const pay = Math.min(amt, f.remaining);
     f.paid += pay;
     f.remaining -= pay;
+    const no = (f.payments.length || 0) + 1;
+    f.payments.push({ no, amount: pay, at: new Date().toISOString(), note });
     if (f.remaining <= 0) { f.remaining = 0; f.status = 'CLOSED'; }
     saveDB();
-    print(`✓ ชำระ ${fmtMoney(pay)} สำหรับ ${f.id} · คงเหลือ ${fmtMoney(f.remaining)}`, 'ok');
+    audit('FIN_PAY', f.id + ' ' + pay);
+    print(`✓ ${isEn() ? 'Paid' : 'ชำระ'} ${fmtMoney(pay)} · ${f.id} · ${isEn() ? 'remain' : 'คงเหลือ'} ${fmtMoney(f.remaining)} · ${isEn() ? 'installment #' : 'งวดที่ '}${no}`, 'ok');
+    print(`  ${isEn() ? 'Paid installments' : 'งวดที่ชำระแล้ว'}: ${financePaidInstallments(f)} / ${f.months} · ${isEn() ? 'left' : 'เหลือ'} ${financeRemainInstallments(f)}`, 'calc');
+    showReceipt(buildFinancePayReceipt(f, pay, no), false);
+    return;
+  }
+  if (sub === 'SCHEDULE' || sub === 'SCH' || sub === 'TABLE') {
+    const fid = (args[1] || '').toUpperCase();
+    const f = DB.finances.find(x => x.id === fid);
+    if (!f) { print(isEn() ? 'Not found' : 'ไม่พบสัญญา', 'error'); return; }
+    printFinanceDetail(f);
+    return;
+  }
+  if (sub === 'EDIT' || sub === 'UPDATE' || sub === 'SET') {
+    const fid = (args[1] || '').toUpperCase();
+    if (!fid) {
+      print(isEn()
+        ? 'FINANCE EDIT <id> purpose=... months=... status=ACTIVE|CLOSED|PENDING'
+        : 'FINANCE EDIT <รหัส> purpose=... months=... status=...', 'error');
+      return;
+    }
+    const f = DB.finances.find(x => x.id === fid);
+    if (!f) { print(isEn() ? 'Not found' : 'ไม่พบ', 'error'); return; }
+    const rest = args.slice(2).join(' ');
+    const pairs = {};
+    const re = /(\w+)=([^=]+?)(?=\s+\w+=|$)/g;
+    let match;
+    while ((match = re.exec(rest)) !== null) pairs[match[1].toLowerCase()] = match[2].trim();
+    if (!Object.keys(pairs).length && args.length >= 3) {
+      pairs.purpose = args.slice(2).join(' ');
+    }
+    if (pairs.purpose !== undefined) { f.purpose = pairs.purpose; f.note = pairs.purpose; }
+    if (pairs.months) {
+      f.months = parseInt(pairs.months, 10) || f.months;
+      f.monthlyInstallment = financeMonthly(f);
+    }
+    if (pairs.status) {
+      const st = pairs.status.toUpperCase();
+      if (!['PENDING', 'ACTIVE', 'CLOSED', 'REJECTED'].includes(st)) {
+        print('status: PENDING|ACTIVE|CLOSED|REJECTED', 'error'); return;
+      }
+      f.status = st;
+    }
+    if (pairs.note !== undefined) f.note = pairs.note;
+    saveDB();
+    audit('FIN_EDIT', f.id);
+    print(`✓ ${isEn() ? 'Updated' : 'แก้ไขแล้ว'} ${f.id}`, 'ok');
+    printFinanceDetail(f);
+    return;
+  }
+  if (sub === 'DEL' || sub === 'DELETE' || sub === 'RM') {
+    const fid = (args[1] || '').toUpperCase();
+    if (!fid) { print('FINANCE DEL <id>', 'error'); return; }
+    const idx = DB.finances.findIndex(x => x.id === fid);
+    if (idx < 0) { print(isEn() ? 'Not found' : 'ไม่พบ', 'error'); return; }
+    const f = DB.finances[idx];
+    if (f.status === 'ACTIVE' && f.remaining > 0) {
+      print(isEn()
+        ? 'Active contract with balance — set CLOSED first or FINANCE EDIT status=CLOSED'
+        : 'สัญญายัง ACTIVE และมียอดคงเหลือ — ปิดสถานะก่อน หรือ FINANCE EDIT status=CLOSED', 'warn');
+      return;
+    }
+    DB.finances.splice(idx, 1);
+    saveDB();
+    audit('FIN_DEL', fid);
+    print(`✓ ${isEn() ? 'Deleted' : 'ลบแล้ว'} ${fid}`, 'ok');
     return;
   }
   // FINANCE <id>
   const f = DB.finances.find(x => x.id.toUpperCase() === sub);
-  if (!f) { print('ไม่พบสัญญา ' + sub, 'error'); return; }
-  const mem = DB.members.find(m => m.id === f.memberId);
-  print(`═══ สัญญา ${f.id} ═══`, 'menu');
-  print(`  สมาชิก    : ${f.memberId} (${mem ? mem.name : '?'})`, 'member');
-  print(`  ผลิตภัณฑ์ : ${f.product}`, 'calc');
-  print(`  ${PRODUCT_DESC[f.product]}`, 'system');
-  print(`  จำนวนต้น  : ${fmtMoney(f.amount)}`, 'money');
-  print(`  รวมชำระ   : ${fmtMoney(f.totalPayable)}`, 'money');
-  print(`  ชำระแล้ว  : ${fmtMoney(f.paid)}`, 'ok');
-  print(`  คงเหลือ   : ${fmtMoney(f.remaining)}`, 'money');
-  print(`  ระยะเวลา  : ${f.months} เดือน`, 'calc');
-  if (f.margin) print(`  อัตรากำไร : ${f.margin}%`, 'calc');
-  if (f.ratio) print(`  สัดส่วน   : ${f.ratio}`, 'calc');
-  print(`  สถานะ     : ${f.status}`, 'ok');
-  print(`  ยื่นเมื่อ  : ${f.applied} · อนุมัติ: ${f.approved || '-'}`, 'system');
+  if (!f) { print((isEn() ? 'Contract not found: ' : 'ไม่พบสัญญา ') + sub, 'error'); return; }
+  printFinanceDetail(f);
+});
+
+// ── 5C Credit assessment (Islamic cooperative) ───────────
+function score5C(memberId, overrides) {
+  const m = DB.members.find(x => x.id === memberId);
+  if (!m) return null;
+  const accs = DB.accounts.filter(a => a.memberId === memberId);
+  const fins = DB.finances.filter(f => f.memberId === memberId);
+  const share = accs.filter(a => a.type === 'SHARE').reduce((s, a) => s + a.balance, 0);
+  const sav = accs.filter(a => a.type === 'SAVINGS').reduce((s, a) => s + a.balance, 0);
+  const inv = accs.filter(a => a.type === 'INVEST').reduce((s, a) => s + a.balance, 0);
+  const activeFin = fins.filter(f => f.status === 'ACTIVE' || f.status === 'APPROVED');
+  const remain = activeFin.reduce((s, f) => s + (f.remaining || 0), 0);
+  const closedOk = fins.filter(f => f.status === 'CLOSED').length;
+  const pending = fins.filter(f => f.status === 'PENDING').length;
+
+  // Character: membership status + repayment history
+  let character = 3;
+  if (m.status === 'ACTIVE') character += 1;
+  if (m.status === 'SUSPENDED' || m.status === 'RESIGNED') character = 1;
+  if (closedOk >= 1) character = Math.min(5, character + 1);
+  if (closedOk >= 3) character = 5;
+
+  // Capacity: savings vs outstanding
+  let capacity = 3;
+  if (sav + inv > remain * 0.5) capacity = 4;
+  if (sav + inv > remain) capacity = 5;
+  if (remain > 0 && sav + inv < remain * 0.2) capacity = 2;
+  if (remain > sav + inv * 2 && remain > 0) capacity = 1;
+
+  // Capital: share capital in cooperative
+  let capital = 2;
+  if (share > 0) capital = 3;
+  if (share >= 5000) capital = 4;
+  if (share >= 20000) capital = 5;
+  if (share === 0) capital = 1;
+
+  // Collateral: for asset-backed products history (Murabaha/Ijarah)
+  let collateral = 3;
+  const assetBacked = fins.filter(f => f.product === 'MURABAHA' || f.product === 'IJARAH');
+  if (assetBacked.length) collateral = 4;
+  if (share >= 10000) collateral = Math.min(5, collateral + 1);
+  if (!accs.length) collateral = 2;
+
+  // Condition: outstanding load + pending apps
+  let condition = 4;
+  if (activeFin.length >= 2) condition = 3;
+  if (activeFin.length >= 3) condition = 2;
+  if (pending >= 2) condition = Math.min(condition, 2);
+  if (remain === 0 && m.status === 'ACTIVE') condition = 5;
+
+  const o = overrides || {};
+  const clamp = n => Math.max(1, Math.min(5, Math.round(Number(n))));
+  if (o.character != null) character = clamp(o.character);
+  if (o.capacity != null) capacity = clamp(o.capacity);
+  if (o.capital != null) capital = clamp(o.capital);
+  if (o.collateral != null) collateral = clamp(o.collateral);
+  if (o.condition != null) condition = clamp(o.condition);
+
+  const total = character + capacity + capital + collateral + condition;
+  const avg = total / 5;
+  let rec = 'REVIEW';
+  let recTh = 'พิจารณาเพิ่ม';
+  if (avg >= 4.2) { rec = 'STRONG'; recTh = 'แข็งแรง — แนะนำอนุมัติได้ในหลักการ'; }
+  else if (avg >= 3.2) { rec = 'ACCEPTABLE'; recTh = 'พอใช้ — อนุมัติได้พร้อมเงื่อนไข'; }
+  else if (avg >= 2.4) { rec = 'WEAK'; recTh = 'อ่อน — ควรขอข้อมูล/หลักประกันเพิ่ม'; }
+  else { rec = 'HIGH_RISK'; recTh = 'เสี่ยงสูง — ไม่แนะนำจนกว่าจะปรับโครงสร้าง'; }
+
+  return {
+    member: m, character, capacity, capital, collateral, condition, total, avg, rec, recTh,
+    share, sav, inv, remain, activeFin: activeFin.length, closedOk, pending
+  };
+}
+
+register(['SCORE', '5C', 'FIVEC'], (args) => {
+  const mid = (args[0] || '').toUpperCase();
+  if (!mid || mid === 'HELP') {
+    print(isEn() ? '═══ 5C assessment (Islamic coop) ═══' : '═══ ประเมิน 5C (สหกรณ์อิสลาม) ═══', 'menu');
+    print(isEn()
+      ? 'Usage: 5C <memberId> [character=n capacity=n capital=n collateral=n condition=n]'
+      : 'ใช้: 5C <รหัสสมาชิก> [character=n capacity=n capital=n collateral=n condition=n]', 'calc');
+    print(isEn() ? '  Scores 1-5 · auto from accounts/finance + optional override'
+      : '  คะแนน 1-5 · คำนวณจากบัญชี/สินเชื่อ + ปรับด้วยมือได้', 'system');
+    print('  Character · Capacity · Capital · Collateral · Condition', 'system');
+    return;
+  }
+  const overrides = {};
+  const rest = args.slice(1).join(' ');
+  const re = /(\w+)=([0-9.]+)/g;
+  let match;
+  while ((match = re.exec(rest)) !== null) {
+    const k = match[1].toLowerCase();
+    const map = { c: 'character', character: 'character', capacity: 'capacity', capital: 'capital',
+      collateral: 'collateral', condition: 'condition', cap: 'capacity', col: 'collateral', cond: 'condition' };
+    if (map[k]) overrides[map[k]] = parseFloat(match[2]);
+  }
+  const s = score5C(mid, overrides);
+  if (!s) { print(isEn() ? 'Member not found' : 'ไม่พบสมาชิก', 'error'); return; }
+  print(isEn() ? `═══ 5C · ${s.member.id} ${s.member.name} ═══` : `═══ 5C · ${s.member.id} ${s.member.name} ═══`, 'menu');
+  print(`  Character   (นิสัย/ประวัติ)     : ${s.character}/5`, 'calc');
+  print(`  Capacity    (ความสามารถชำระ)  : ${s.capacity}/5`, 'calc');
+  print(`  Capital     (ทุน/หุ้นสหกรณ์)   : ${s.capital}/5`, 'calc');
+  print(`  Collateral  (หลักประกัน/สินทรัพย์): ${s.collateral}/5`, 'calc');
+  print(`  Condition   (เงื่อนไข/ภาระ)    : ${s.condition}/5`, 'calc');
+  print(`  ─────────────────────────────────`, 'system');
+  print(`  ${isEn() ? 'Total' : 'รวม'} ${s.total}/25 · ${isEn() ? 'Average' : 'เฉลี่ย'} ${s.avg.toFixed(2)}`, 'money');
+  print(`  ${isEn() ? 'Recommendation' : 'คำแนะนำ'}: ${s.rec} — ${isEn() ? s.rec : s.recTh}`, s.avg >= 3.2 ? 'ok' : 'warn');
+  print(isEn() ? '  Data used:' : '  ข้อมูลที่ใช้:', 'system');
+  print(`    ${isEn() ? 'Share' : 'หุ้น'} ${fmtMoney(s.share)} · ${isEn() ? 'Savings' : 'ออม'} ${fmtMoney(s.sav)} · ${isEn() ? 'Invest' : 'ลงทุน'} ${fmtMoney(s.inv)}`, 'calc');
+  print(`    ${isEn() ? 'Outstanding finance' : 'สินเชื่อคงค้าง'} ${fmtMoney(s.remain)} · active ${s.activeFin} · closed ${s.closedOk} · pending ${s.pending}`, 'calc');
+  print(isEn()
+    ? '  Note: educational aid — not a Sharia Board ruling'
+    : '  หมายเหตุ: เครื่องมือช่วยตัดสินใจ — ไม่ใช่คำฟัตวาของ Sharia Board', 'system');
+  audit('5C', mid + ' avg=' + s.avg.toFixed(2));
 });
 
 // ── Reports & Sharia ─────────────────────────────────────
@@ -1784,8 +2494,17 @@ register(['SHARIA', 'ISLAMIC'], () => {
 });
 
 register(['CLEAR', 'CLS'], () => { clearTerm(); print('หน้าจอถูกล้าง', 'system'); });
-register(['SAVE'], () => { saveDB(); print('✓ บันทึกข้อมูลลง localStorage แล้ว', 'ok'); });
+register(['SAVE'], () => {
+  if (!requireLogin(false)) return;
+  if (isVaultOnly()) {
+    print(isEn() ? 'VAULT-ONLY mode — use VAULT SAVE (localStorage disabled)' : 'โหมด VAULT-ONLY — ใช้ VAULT SAVE (ไม่เขียน localStorage)', 'warn');
+    return;
+  }
+  saveDB();
+  print(isEn() ? '✓ Saved to localStorage' : '✓ บันทึกข้อมูลลง localStorage แล้ว', 'ok');
+});
 register(['EXPORT'], () => {
+  if (!requireLogin(false)) return;
   const safe = JSON.parse(JSON.stringify(DB));
   (safe.users || []).forEach(u => { delete u.password; });
   downloadJson(safe, `algor-bank-export-${new Date().toISOString().slice(0,10)}.json`);
@@ -2030,6 +2749,42 @@ register(['USER', 'USERS'], async (args) => {
     print(`✓ Password updated for ${username} (hashed)`, 'ok');
     return;
   }
+  if (sub === 'EDIT' || sub === 'UPDATE' || sub === 'SET') {
+    const username = args[1];
+    if (!username) {
+      print(isEn()
+        ? 'USER EDIT <username> role=ADMIN|TELLER|VIEW name=...'
+        : 'USER EDIT <username> role=ADMIN|TELLER|VIEW name=...', 'error');
+      return;
+    }
+    const u = DB.users.find(x => x.username === username);
+    if (!u) { print(isEn() ? 'User not found' : 'ไม่พบผู้ใช้', 'error'); return; }
+    const rest = args.slice(2).join(' ');
+    const pairs = {};
+    const re = /(\w+)=([^=]+?)(?=\s+\w+=|$)/g;
+    let match;
+    while ((match = re.exec(rest)) !== null) pairs[match[1].toLowerCase()] = match[2].trim();
+    if (!Object.keys(pairs).length) {
+      print(isEn() ? 'Specify role=... and/or name=...' : 'ระบุ role=... และ/หรือ name=...', 'warn');
+      return;
+    }
+    if (pairs.role) {
+      const role = pairs.role.toUpperCase();
+      if (!['ADMIN', 'TELLER', 'VIEW'].includes(role)) {
+        print('Role: ADMIN | TELLER | VIEW', 'error'); return;
+      }
+      if (u.username === 'admin' && role !== 'ADMIN') {
+        print(isEn() ? 'Cannot demote built-in admin' : 'ลดสิทธิ์ admin หลักไม่ได้', 'error');
+        return;
+      }
+      u.role = role;
+    }
+    if (pairs.name) u.name = pairs.name;
+    saveDB();
+    audit('USER_EDIT', username);
+    print(`✓ User ${username} updated · role ${u.role} · name ${u.name || '-'}`, 'ok');
+    return;
+  }
   if (sub === 'DEL' || sub === 'DELETE' || sub === 'RM') {
     const username = args[1];
     if (!username) { print('USER DEL <username>', 'error'); return; }
@@ -2046,7 +2801,7 @@ register(['USER', 'USERS'], async (args) => {
     print(`✓ User ${username} deleted`, 'ok');
     return;
   }
-  print('USER LIST | USER ADD <user> <pass> [role] | USER PASS <user> <new> | USER DEL <user>', 'error');
+  print('USER LIST | USER ADD <user> <pass> [role] | USER EDIT <user> role=... name=... | USER PASS <user> <new> | USER DEL <user>', 'error');
 });
 
 register(['AUDIT', 'LOG'], (args) => {
@@ -2111,6 +2866,51 @@ register(['RECEIPT', 'SLIP'], (args) => {
   if (!tx) { print(isEn() ? 'Transaction not found' : 'ไม่พบรายการ', 'error'); return; }
   showReceipt(buildTxReceipt(tx));
   print(`✓ Receipt ${tx.id} ready — use PRINT in the window`, 'ok');
+});
+
+
+register(['SETTINGS', 'SETTING', 'CONFIG', 'INST'], (args) => {
+  const sub = (args[0] || 'SHOW').toUpperCase();
+  if (sub === 'SHOW' || sub === 'STATUS' || sub === 'LIST') {
+    const s = DB.settings;
+    print(isEn() ? '═══ Institution settings ═══' : '═══ ตั้งค่าสถาบัน ═══', 'menu');
+    print(`  name     : ${s.coopName || '-'}`, 'calc');
+    print(`  branch   : ${s.branch || '-'}`, 'calc');
+    print(`  address  : ${s.address || '-'}`, 'calc');
+    print(`  phone    : ${s.phone || '-'}`, 'calc');
+    print(`  email    : ${s.email || '-'}`, 'calc');
+    print(isEn()
+      ? '  Edit: SETTINGS name=... address=... phone=... email=... branch=...'
+      : '  แก้: SETTINGS name=... address=... phone=... email=... branch=...', 'system');
+    return;
+  }
+  if (!requireLogin(true)) return;
+  // SETTINGS name=... or SETTINGS SET name=...
+  let rest = args.join(' ');
+  if (sub === 'SET' || sub === 'EDIT') rest = args.slice(1).join(' ');
+  const pairs = {};
+  const re = /(\w+)=([^=]+?)(?=\s+\w+=|$)/g;
+  let match;
+  while ((match = re.exec(rest)) !== null) {
+    pairs[match[1].toLowerCase()] = match[2].trim();
+  }
+  if (!Object.keys(pairs).length) {
+    print(isEn()
+      ? 'SETTINGS SHOW | SETTINGS name=... address=... phone=... email=... branch=...'
+      : 'SETTINGS SHOW | SETTINGS name=... address=... phone=... email=... branch=...', 'error');
+    return;
+  }
+  if (pairs.name || pairs.coopname || pairs.coop) DB.settings.coopName = pairs.name || pairs.coopname || pairs.coop;
+  if (pairs.address !== undefined || pairs.addr !== undefined) DB.settings.address = pairs.address || pairs.addr;
+  if (pairs.phone !== undefined || pairs.tel !== undefined) DB.settings.phone = pairs.phone || pairs.tel;
+  if (pairs.email !== undefined) DB.settings.email = pairs.email;
+  if (pairs.branch !== undefined) DB.settings.branch = pairs.branch;
+  saveDB();
+  audit('SETTINGS', JSON.stringify(pairs).slice(0, 120));
+  print(isEn() ? '✓ Institution settings saved (used on slips)' : '✓ บันทึกตั้งค่าสถาบันแล้ว (แสดงบนสลิป)', 'ok');
+  const s = DB.settings;
+  print(`  name=${s.coopName || '-'}  branch=${s.branch || '-'}  phone=${s.phone || '-'}`, 'calc');
+  print(`  address=${s.address || '-'}  email=${s.email || '-'}`, 'calc');
 });
 
 register(['CSV', 'IMPORT'], (args) => {
@@ -2269,6 +3069,7 @@ function openGui() {
   refreshGuiAccounts();
   refreshGuiFinance();
   refreshGuiTx();
+  refreshGuiSettings();
 }
 function closeGui() { $('gui').classList.remove('open'); }
 
@@ -2285,14 +3086,11 @@ document.querySelectorAll('.gui-tab').forEach(tab => {
     tab.classList.add('active');
     $('gui-panel-' + tabName).classList.add('active');
     if (tabName === 'dash') refreshDash();
-    if (tabName === 'members') refreshGuiMembers();
-    if (tabName === 'accounts') refreshGuiAccounts();
-    if (tabName === 'finance') refreshGuiFinance();
-    if (tabName === 'tx') refreshGuiTx();
     if (tabName === 'report') guiRefreshReport();
-    if (tabName === 'tools') guiToolsRefresh();
     if (tabName === 'auth') refreshGuiAuth();
     if (tabName === 'vault') refreshGuiVault();
+    if (tabName === 'score') { /* 5C form ready */ }
+    if (tabName === 'settings') refreshGuiSettings();
   });
 });
 
@@ -2301,6 +3099,18 @@ function refreshDash() {
   const totalShare = DB.accounts.filter(a => a.type === 'SHARE').reduce((s, a) => s + a.balance, 0);
   const totalInv = DB.accounts.filter(a => a.type === 'INVEST').reduce((s, a) => s + a.balance, 0);
   const totalFin = DB.finances.filter(f => f.status === 'ACTIVE' || f.status === 'APPROVED').reduce((s, f) => s + f.remaining, 0);
+  const q = $('dash-quick');
+  if (q) {
+    q.innerHTML = sessionUser ? `
+      <button class="gui-btn-sm" onclick="guiGoTab('members')">${isEn()?'Members':'สมาชิก'}</button>
+      <button class="gui-btn-sm" onclick="guiGoTab('accounts')">${isEn()?'Accounts':'บัญชี'}</button>
+      <button class="gui-btn-sm" onclick="guiGoTab('tx')">${isEn()?'Deposit/Withdraw':'ฝาก-ถอน'}</button>
+      <button class="gui-btn-sm" onclick="guiGoTab('finance')">${isEn()?'Finance':'สินเชื่อ'}</button>
+      <button class="gui-btn-sm" onclick="guiGoTab('score')">5C</button>
+      <button class="gui-btn-sm" onclick="guiGoTab('settings')">${isEn()?'Settings':'ตั้งค่า'}</button>
+      <button class="gui-btn-sm" onclick="guiGoTab('vault')">Vault</button>
+    ` : `<span class="gui-hint">${isEn()?'Login on AUTH tab first':'LOGIN ที่แท็บ AUTH ก่อน'}</span>`;
+  }
   $('dash-stats').innerHTML = `
     <div class="stat-box"><div class="lbl">${t('dash_members')}</div><div class="val">${DB.members.length}</div></div>
     <div class="stat-box"><div class="lbl">${t('dash_accounts')}</div><div class="val">${DB.accounts.length}</div></div>
@@ -2341,11 +3151,12 @@ function guiAddMember() {
     phone: $('m-phone').value.trim(),
     address: $('m-addr').value.trim(),
     joined: new Date().toISOString().slice(0,10),
-    status: 'ACTIVE'
+    status: ($('m-status')?.value || 'ACTIVE').toUpperCase()
   };
   if (DB.members.some(x => x.id === m.id)) { alert(isEn() ? 'ID exists' : 'รหัสซ้ำ'); return; }
   DB.members.push(m);
   saveDB();
+  audit('MEMBER_ADD', m.id);
   guiClearMemberForm();
   refreshGuiMembers();
   refreshDash();
@@ -2353,6 +3164,7 @@ function guiAddMember() {
 }
 function guiClearMemberForm() {
   $('m-name').value = ''; $('m-phone').value = ''; $('m-addr').value = ''; $('m-id').value = '';
+  if ($('m-status')) $('m-status').value = 'ACTIVE';
   editingMemberId = null;
   $('btn-m-add').style.display = '';
   $('btn-m-update').style.display = 'none';
@@ -2367,6 +3179,7 @@ function guiEditMember(id) {
   $('m-name').value = m.name;
   $('m-phone').value = m.phone || '';
   $('m-addr').value = m.address || '';
+  if ($('m-status')) $('m-status').value = m.status || 'ACTIVE';
   $('btn-m-add').style.display = 'none';
   $('btn-m-update').style.display = '';
   $('btn-m-cancel').style.display = '';
@@ -2381,7 +3194,9 @@ function guiUpdateMember() {
   m.name = name;
   m.phone = $('m-phone').value.trim();
   m.address = $('m-addr').value.trim();
+  if ($('m-status')) m.status = $('m-status').value.toUpperCase();
   saveDB();
+  audit('MEMBER_EDIT', m.id);
   guiClearMemberForm();
   refreshGuiMembers();
   print(`✓ [GUI] updated ${m.id}`, 'ok');
@@ -2399,21 +3214,15 @@ function refreshGuiMembers() {
     );
   }
   const act = isEn() ? 'Edit' : 'แก้ไข';
+  const del = isEn() ? 'Del' : 'ลบ';
   let html = `<table class="gui-table"><tr><th>ID</th><th>${isEn()?'Name':'ชื่อ'}</th><th>${isEn()?'Phone':'โทร'}</th><th>Status</th><th></th></tr>`;
   list.forEach(m => {
     html += `<tr><td>${escapeHtml(m.id)}</td><td>${escapeHtml(m.name)}</td><td>${escapeHtml(m.phone||'-')}</td><td>${escapeHtml(m.status)}</td>
-      <td style="white-space:nowrap">
-        <button class="gui-btn-sm" onclick="guiEditMember('${escapeHtml(m.id)}')">${act}</button>
-        <button class="gui-btn-sm" onclick="guiUseMember('${escapeHtml(m.id)}')" title="fill forms">ID</button>
-      </td></tr>`;
+      <td><button class="gui-btn-sm" onclick="guiEditMember('${escapeHtml(m.id)}')">${act}</button>
+      <button class="gui-btn-sm gui-btn-danger" onclick="guiDeleteMember('${escapeHtml(m.id)}')">${del}</button></td></tr>`;
   });
   html += '</table>';
   $('gui-member-list').innerHTML = list.length ? html : `<div style="color:var(--cyan-dim)">${isEn()?'No members':'ยังไม่มีสมาชิก'}</div>`;
-}
-function guiUseMember(id) {
-  if ($('a-mid')) $('a-mid').value = id;
-  if ($('f-mid')) $('f-mid').value = id;
-  print(`[GUI] member ${id} → account/finance forms`, 'system');
 }
 function guiImportCsv() {
   if (!requireGuiWrite()) return;
@@ -2421,6 +3230,13 @@ function guiImportCsv() {
   if (inp) { inp.value = ''; inp.click(); }
 }
 
+function guiDeleteMember(id) {
+  if (!requireGuiWrite()) return;
+  if (!confirm(isEn() ? 'Delete member ' + id + '?' : 'ลบสมาชิก ' + id + '?')) return;
+  runCommand('MEMBER DEL ' + id);
+  refreshGuiMembers();
+  refreshDash();
+}
 function guiOpenAccount() {
   if (!requireGuiWrite()) return;
   const mid = $('a-mid').value.trim().toUpperCase();
@@ -2435,58 +3251,32 @@ function guiOpenAccount() {
   DB.accounts.push(a);
   if (bal > 0) addTxInternal(a.id, 'DEPOSIT', bal, 'เปิดบัญชี');
   saveDB();
-  audit('ACCOUNT_OPEN', a.id + ' ' + type);
+  audit('ACC_OPEN', a.id);
   refreshGuiAccounts();
   refreshDash();
-  print(`✓ [GUI] เปิดบัญชี ${a.id}`, 'ok');
+  print(`✓ [GUI] ${isEn()?'Opened':'เปิดบัญชี'} ${a.id}`, 'ok');
+  showReceipt(buildAccountOpenReceipt(a), false);
 }
-function guiQuickDep() {
+function guiCloseAccount(id) {
   if (!requireGuiWrite()) return;
-  const accId = ($('a-tx-acc')?.value || '').trim().toUpperCase();
-  const amount = parseFloat($('a-tx-amt')?.value);
-  const note = ($('a-tx-note')?.value || '').trim() || 'ฝากเงิน';
-  if (!accId || isNaN(amount) || amount <= 0) { alert(isEn() ? 'Account + amount required' : 'ใส่เลขบัญชีและจำนวน'); return; }
-  const a = DB.accounts.find(x => x.id === accId);
-  if (!a) { alert(isEn() ? 'Account not found' : 'ไม่พบบัญชี'); return; }
-  if (a.status !== 'ACTIVE') { alert(isEn() ? 'Account inactive' : 'บัญชีไม่พร้อมใช้งาน'); return; }
-  a.balance += amount;
-  const tx = addTxInternal(a.id, 'DEPOSIT', amount, note);
-  saveDB();
-  audit('DEPOSIT', a.id + ' ' + amount);
+  runCommand('ACCOUNT CLOSE ' + id);
   refreshGuiAccounts();
-  refreshGuiTx();
-  refreshDash();
-  print(`✓ [GUI] ฝาก ${fmtMoney(amount)} → ${a.id} · ยอด ${fmtMoney(a.balance)}`, 'ok');
-  if (tx && confirm(isEn() ? 'Print receipt?' : 'พิมพ์ใบเสร็จ?')) showReceipt(buildTxReceipt(tx));
 }
-function guiQuickWd() {
+function guiDeleteAccount(id) {
   if (!requireGuiWrite()) return;
-  const accId = ($('a-tx-acc')?.value || '').trim().toUpperCase();
-  const amount = parseFloat($('a-tx-amt')?.value);
-  const note = ($('a-tx-note')?.value || '').trim() || 'ถอนเงิน';
-  if (!accId || isNaN(amount) || amount <= 0) { alert(isEn() ? 'Account + amount required' : 'ใส่เลขบัญชีและจำนวน'); return; }
-  const a = DB.accounts.find(x => x.id === accId);
-  if (!a) { alert(isEn() ? 'Account not found' : 'ไม่พบบัญชี'); return; }
-  if (a.type === 'SHARE') { alert(isEn() ? 'Share account cannot withdraw directly' : 'บัญชีหุ้นถอนตรงไม่ได้'); return; }
-  if (a.balance < amount) { alert(isEn() ? 'Insufficient balance' : 'ยอดไม่พอ'); return; }
-  a.balance -= amount;
-  const tx = addTxInternal(a.id, 'WITHDRAW', amount, note);
-  saveDB();
-  audit('WITHDRAW', a.id + ' ' + amount);
+  if (!confirm(isEn() ? 'Delete account ' + id + '?' : 'ลบบัญชี ' + id + '?')) return;
+  runCommand('ACCOUNT DEL ' + id);
   refreshGuiAccounts();
-  refreshGuiTx();
-  refreshDash();
-  print(`✓ [GUI] ถอน ${fmtMoney(amount)} ← ${a.id} · ยอด ${fmtMoney(a.balance)}`, 'ok');
-  if (tx && confirm(isEn() ? 'Print receipt?' : 'พิมพ์ใบเสร็จ?')) showReceipt(buildTxReceipt(tx));
 }
 function refreshGuiAccounts() {
-  let html = `<table class="gui-table"><tr><th>${isEn()?'Acc':'บัญชี'}</th><th>${isEn()?'Member':'สมาชิก'}</th><th>${isEn()?'Type':'ประเภท'}</th><th>${isEn()?'Balance':'ยอด'}</th><th></th></tr>`;
+  let html = `<table class="gui-table"><tr><th>${isEn()?'Acct':'บัญชี'}</th><th>${isEn()?'Member':'สมาชิก'}</th><th>${isEn()?'Type':'ประเภท'}</th><th>${isEn()?'Balance':'ยอด'}</th><th>Status</th><th></th></tr>`;
   DB.accounts.forEach(a => {
-    html += `<tr><td>${escapeHtml(a.id)}</td><td>${escapeHtml(a.memberId)}</td><td>${escapeHtml(a.type)}</td><td class="money">${fmtMoney(a.balance)}</td>
-      <td><button class="gui-btn-sm" onclick="document.getElementById('a-tx-acc').value='${escapeHtml(a.id)}'">ใช้</button></td></tr>`;
+    html += `<tr><td>${escapeHtml(a.id)}</td><td>${escapeHtml(a.memberId)}</td><td>${escapeHtml(a.type)}</td><td>${fmtMoney(a.balance)}</td><td>${escapeHtml(a.status)}</td>
+      <td><button class="gui-btn-sm" onclick="guiCloseAccount('${escapeHtml(a.id)}')">${isEn()?'Close':'ปิด'}</button>
+      <button class="gui-btn-sm gui-btn-danger" onclick="guiDeleteAccount('${escapeHtml(a.id)}')">${isEn()?'Del':'ลบ'}</button></td></tr>`;
   });
   html += '</table>';
-  $('gui-account-list').innerHTML = DB.accounts.length ? html : `<div style="color:var(--muted)">${isEn()?'No accounts':'ยังไม่มีบัญชี'}</div>`;
+  $('gui-account-list').innerHTML = html;
 }
 
 function guiApplyFinance() {
@@ -2497,63 +3287,118 @@ function guiApplyFinance() {
   const months = parseInt($('f-months').value) || 12;
   const margin = parseFloat($('f-margin').value) || 0;
   const ratio = $('f-ratio').value || '70:30';
-  if (!mid || isNaN(amount) || amount <= 0) { alert(isEn() ? 'Incomplete data' : 'ข้อมูลไม่ครบ'); return; }
-  if (!DB.members.find(m => m.id === mid)) { alert(isEn() ? 'Member not found' : 'ไม่พบสมาชิก'); return; }
+  const purpose = ($('f-purpose')?.value || '').trim();
+  if (!mid || isNaN(amount) || amount <= 0) { alert(isEn()?'Incomplete':'ข้อมูลไม่ครบ'); return; }
+  if (!purpose) { alert(isEn()?'Purpose required':'กรุณาระบุวัตถุประสงค์'); return; }
+  if (!DB.members.find(m => m.id === mid)) { alert(isEn()?'Member not found':'ไม่พบสมาชิก'); return; }
   let totalPayable = amount;
   if (product === 'MURABAHA' || product === 'IJARAH') totalPayable = amount * (1 + margin / 100);
   const f = {
     id: genId('F', 'nextFinanceId'), memberId: mid, product, amount, margin, ratio, months,
-    totalPayable, remaining: totalPayable, paid: 0, status: 'PENDING',
-    applied: new Date().toISOString().slice(0,10), approved: null, note: ''
+    totalPayable, remaining: totalPayable, paid: 0,
+    monthlyInstallment: totalPayable / Math.max(1, months),
+    purpose, note: purpose, payments: [],
+    status: 'PENDING',
+    applied: new Date().toISOString().slice(0,10), approved: null
   };
   DB.finances.push(f);
   saveDB();
-  audit('FINANCE_APPLY', f.id + ' ' + product);
+  audit('FIN_APPLY', f.id + ' ' + purpose);
+  if ($('f-purpose')) $('f-purpose').value = '';
   refreshGuiFinance();
   refreshDash();
-  print(`✓ [GUI] ยื่นคำขอ ${f.id}`, 'ok');
+  print(`✓ [GUI] ${f.id} · ${purpose}`, 'ok');
 }
-function guiFinanceApprove() {
-  if (!requireGuiWrite()) return;
-  const fid = ($('f-pay-id')?.value || '').trim().toUpperCase();
-  if (!fid) { alert(isEn() ? 'Finance ID required' : 'ใส่รหัสสัญญา'); return; }
-  const f = DB.finances.find(x => x.id === fid);
-  if (!f) { alert(isEn() ? 'Not found' : 'ไม่พบสัญญา'); return; }
-  if (f.status !== 'PENDING') { alert(isEn() ? 'Status is not PENDING' : 'สถานะไม่ใช่ PENDING'); return; }
-  f.status = 'ACTIVE';
-  f.approved = new Date().toISOString().slice(0,10);
-  saveDB();
-  audit('FINANCE_APPROVE', fid);
-  refreshGuiFinance();
-  refreshDash();
-  print(`✓ [GUI] อนุมัติ ${f.id} → ACTIVE`, 'ok');
+function guiFinanceDetail(id) {
+  const f = DB.finances.find(x => x.id === id);
+  const box = $('gui-finance-detail');
+  if (!f || !box) return;
+  ensureFinanceShape(f);
+  const monthly = financeMonthly(f);
+  const paidN = financePaidInstallments(f);
+  const remainN = financeRemainInstallments(f);
+  const months = Math.max(1, parseInt(f.months, 10) || 12);
+  let html = `<div class="stat-box"><div class="lbl">${f.id} · ${escapeHtml(f.product)} · ${escapeHtml(f.status)}</div>`;
+  html += `<div style="margin-top:8px;line-height:1.6">`;
+  html += `<div><b>${isEn()?'Purpose':'วัตถุประสงค์'}:</b> ${escapeHtml(f.purpose || '-')}</div>`;
+  html += `<div>${isEn()?'Total due':'รวมชำระ'}: ${fmtMoney(f.totalPayable)} · ${isEn()?'Paid':'ชำระแล้ว'}: ${fmtMoney(f.paid)} · ${isEn()?'Remain':'คงเหลือ'}: ${fmtMoney(f.remaining)}</div>`;
+  html += `<div>${isEn()?'Installment':'ค่างวด'}: ${fmtMoney(monthly)} / ${isEn()?'mo':'เดือน'} · ${isEn()?'Paid periods':'งวดที่จ่าย'}: ${paidN}/${months} · ${isEn()?'Left':'เหลือ'}: ${remainN}</div>`;
+  if (f.payments && f.payments.length) {
+    html += `<div style="margin-top:6px">${isEn()?'Payments':'ประวัติชำระ'}:</div><ul style="margin-left:16px">`;
+    f.payments.slice().reverse().slice(0, 8).forEach(p => {
+      html += `<li>#${p.no} ${fmtMoney(p.amount)} ${(p.at||'').slice(0,10)} ${escapeHtml(p.note||'')}</li>`;
+    });
+    html += '</ul>';
+  }
+  html += `<div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap">`;
+  if (f.status === 'PENDING') html += `<button class="gui-btn-sm" onclick="guiFinanceApprove('${escapeHtml(f.id)}')">${isEn()?'Approve':'อนุมัติ'}</button>`;
+  if (f.status === 'ACTIVE' || f.status === 'APPROVED') {
+    html += `<button class="gui-btn-sm" onclick="guiFinancePay('${escapeHtml(f.id)}')">${isEn()?'Pay installment':'ชำระงวด'}</button>`;
+  }
+  html += `<button class="gui-btn-sm gui-btn-danger" onclick="guiFinanceDelete('${escapeHtml(f.id)}')">${isEn()?'Delete':'ลบ'}</button>`;
+  html += `</div></div></div>`;
+  box.innerHTML = html;
 }
-function guiFinancePay() {
+function guiFinanceApprove(id) {
   if (!requireGuiWrite()) return;
-  const fid = ($('f-pay-id')?.value || '').trim().toUpperCase();
-  const amt = parseFloat($('f-pay-amt')?.value);
-  if (!fid || isNaN(amt) || amt <= 0) { alert(isEn() ? 'ID + amount required' : 'ใส่รหัสและจำนวนชำระ'); return; }
-  const f = DB.finances.find(x => x.id === fid);
-  if (!f) { alert(isEn() ? 'Not found' : 'ไม่พบสัญญา'); return; }
-  if (f.status !== 'ACTIVE' && f.status !== 'APPROVED') { alert(isEn() ? 'Not ready for payment' : 'สัญญาไม่พร้อมชำระ'); return; }
-  const pay = Math.min(amt, f.remaining);
-  f.paid += pay;
-  f.remaining -= pay;
-  if (f.remaining <= 0) { f.remaining = 0; f.status = 'CLOSED'; }
-  saveDB();
-  audit('FINANCE_PAY', fid + ' ' + pay);
+  runCommand('FINANCE APPROVE ' + id);
   refreshGuiFinance();
+  guiFinanceDetail(id);
+}
+function guiFinancePay(id) {
+  if (!requireGuiWrite()) return;
+  const f = DB.finances.find(x => x.id === id);
+  if (!f) return;
+  const sug = financeMonthly(f).toFixed(2);
+  const raw = prompt(isEn() ? 'Payment amount' : 'จำนวนที่ชำระ', sug);
+  if (raw == null) return;
+  const amt = parseFloat(raw);
+  if (isNaN(amt) || amt <= 0) return;
+  runCommand('FINANCE PAY ' + id + ' ' + amt);
+  refreshGuiFinance();
+  guiFinanceDetail(id);
   refreshDash();
-  print(`✓ [GUI] ชำระ ${fmtMoney(pay)} · ${f.id} คงเหลือ ${fmtMoney(f.remaining)}`, 'ok');
+}
+function guiFinanceDelete(id) {
+  if (!requireGuiWrite()) return;
+  if (!confirm(isEn() ? 'Delete ' + id + '?' : 'ลบ ' + id + '?')) return;
+  runCommand('FINANCE DEL ' + id);
+  refreshGuiFinance();
+  const box = $('gui-finance-detail');
+  if (box) box.innerHTML = '';
 }
 function refreshGuiFinance() {
-  let html = `<table class="gui-table"><tr><th>${isEn()?'ID':'รหัส'}</th><th>${isEn()?'Member':'สมาชิก'}</th><th>${isEn()?'Product':'ผลิตภัณฑ์'}</th><th>${isEn()?'Amount':'จำนวน'}</th><th>${isEn()?'Remain':'คงเหลือ'}</th><th>${isEn()?'Status':'สถานะ'}</th><th></th></tr>`;
+  let html = `<table class="gui-table"><tr><th>ID</th><th>${isEn()?'Member':'สมาชิก'}</th><th>${isEn()?'Product':'ผลิตภัณฑ์'}</th><th>${isEn()?'Purpose':'วัตถุประสงค์'}</th><th>${isEn()?'Remain':'คงเหลือ'}</th><th>${isEn()?'Term':'งวด'}</th><th>Status</th><th></th></tr>`;
   DB.finances.forEach(f => {
-    html += `<tr><td>${escapeHtml(f.id)}</td><td>${escapeHtml(f.memberId)}</td><td>${escapeHtml(f.product)}</td><td>${fmtMoney(f.amount)}</td><td>${fmtMoney(f.remaining)}</td><td>${escapeHtml(f.status)}</td>
-      <td><button class="gui-btn-sm" onclick="document.getElementById('f-pay-id').value='${escapeHtml(f.id)}'">ใช้</button></td></tr>`;
+    ensureFinanceShape(f);
+    html += `<tr><td>${escapeHtml(f.id)}</td><td>${escapeHtml(f.memberId)}</td><td>${escapeHtml(f.product)}</td><td>${escapeHtml((f.purpose||'-').slice(0,24))}</td><td>${fmtMoney(f.remaining)}</td><td>${f.months}m</td><td>${escapeHtml(f.status)}</td>
+      <td><button class="gui-btn-sm" onclick="guiFinanceDetail('${escapeHtml(f.id)}')">${isEn()?'Detail':'รายละเอียด'}</button></td></tr>`;
   });
   html += '</table>';
-  $('gui-finance-list').innerHTML = DB.finances.length ? html : `<div style="color:var(--muted)">${isEn()?'No finance contracts':'ยังไม่มีสัญญา'}</div>`;
+  $('gui-finance-list').innerHTML = html;
+}
+function guiRun5C() {
+  if (!requireGuiLogin()) return;
+  const mid = ($('s5-mid')?.value || '').trim().toUpperCase();
+  if (!mid) { alert(isEn()?'Member ID required':'ใส่รหัสสมาชิก'); return; }
+  const overrides = {};
+  const c = parseFloat($('s5-c')?.value); if (!isNaN(c)) overrides.character = c;
+  const cap = parseFloat($('s5-cap')?.value); if (!isNaN(cap)) overrides.capacity = cap;
+  const cap2 = parseFloat($('s5-cap2')?.value); if (!isNaN(cap2)) overrides.capital = cap2;
+  const col = parseFloat($('s5-col')?.value); if (!isNaN(col)) overrides.collateral = col;
+  const cond = parseFloat($('s5-cond')?.value); if (!isNaN(cond)) overrides.condition = cond;
+  const s = score5C(mid, overrides);
+  const box = $('gui-score-result');
+  if (!s) { if (box) box.innerHTML = isEn()?'Not found':'ไม่พบสมาชิก'; return; }
+  let html = `<div class="stat-box"><div class="lbl">5C · ${escapeHtml(s.member.id)} ${escapeHtml(s.member.name)}</div>`;
+  html += `<div style="margin-top:8px;line-height:1.7">`;
+  html += `Character ${s.character}/5 · Capacity ${s.capacity}/5 · Capital ${s.capital}/5 · Collateral ${s.collateral}/5 · Condition ${s.condition}/5<br>`;
+  html += `<b>${isEn()?'Total':'รวม'} ${s.total}/25 · ${isEn()?'Avg':'เฉลี่ย'} ${s.avg.toFixed(2)}</b><br>`;
+  html += `<span style="color:${s.avg>=3.2?'var(--green)':'var(--amber)'}">${s.rec} — ${isEn()?s.rec:s.recTh}</span><br>`;
+  html += `<span style="color:var(--muted)">${isEn()?'Share':'หุ้น'} ${fmtMoney(s.share)} · ${isEn()?'Savings':'ออม'} ${fmtMoney(s.sav)} · ${isEn()?'Outstanding':'คงค้าง'} ${fmtMoney(s.remain)}</span>`;
+  html += `</div></div>`;
+  if (box) box.innerHTML = html;
+  audit('5C', mid + ' GUI');
 }
 
 function guiDoTx() {
@@ -2577,77 +3422,56 @@ function guiDoTx() {
   refreshGuiAccounts();
   refreshDash();
   print(`✓ [GUI] ${type} ${fmtMoney(amount)} ${accId}`, 'ok');
-  if (tx && confirm(isEn() ? 'Print receipt?' : 'พิมพ์ใบเสร็จ?')) {
-    showReceipt(buildTxReceipt(tx));
-  }
+  if (tx) showReceipt(buildTxReceipt(tx), false);
 }
 function refreshGuiTx() {
-  let html = `<table class="gui-table"><tr><th>${isEn()?'ID':'รหัส'}</th><th>${isEn()?'Acc':'บัญชี'}</th><th>${isEn()?'Type':'ประเภท'}</th><th>${isEn()?'Amount':'จำนวน'}</th><th>${isEn()?'Note':'หมายเหตุ'}</th><th></th></tr>`;
-  DB.transactions.slice().reverse().slice(0, 30).forEach(tx => {
-    html += `<tr><td>${escapeHtml(tx.id)}</td><td>${escapeHtml(tx.accountId)}</td><td>${escapeHtml(tx.type)}</td><td>${fmtMoney(tx.amount)}</td><td>${escapeHtml(tx.note||'')}</td>
-      <td><button class="gui-btn-sm" onclick="guiPrintReceipt('${escapeHtml(tx.id)}')">${isEn()?'Slip':'ใบเสร็จ'}</button></td></tr>`;
+  let html = '<table class="gui-table"><tr><th>รหัส</th><th>บัญชี</th><th>ประเภท</th><th>จำนวน</th><th>หมายเหตุ</th></tr>';
+  DB.transactions.slice().reverse().slice(0, 20).forEach(t => {
+    html += `<tr><td>${t.id}</td><td>${t.accountId}</td><td>${t.type}</td><td>${fmtMoney(t.amount)}</td><td>${t.note||''}</td></tr>`;
   });
   html += '</table>';
-  $('gui-tx-list').innerHTML = DB.transactions.length ? html : `<div style="color:var(--muted)">${isEn()?'No transactions':'ยังไม่มีรายการ'}</div>`;
-}
-function guiPrintReceipt(txId) {
-  const tx = DB.transactions.find(t => t.id === txId);
-  if (!tx) { alert(isEn() ? 'Not found' : 'ไม่พบรายการ'); return; }
-  showReceipt(buildTxReceipt(tx));
-  print(`✓ [GUI] Receipt ${tx.id}`, 'ok');
+  $('gui-tx-list').innerHTML = html;
 }
 
 function guiRefreshReport() {
-  if (!requireGuiLogin()) return;
   const totalAssets = DB.accounts.reduce((s, a) => s + a.balance, 0);
-  const totalSav = DB.accounts.filter(a => a.type === 'SAVINGS').reduce((s, a) => s + a.balance, 0);
-  const totalShare = DB.accounts.filter(a => a.type === 'SHARE').reduce((s, a) => s + a.balance, 0);
-  const totalInv = DB.accounts.filter(a => a.type === 'INVEST').reduce((s, a) => s + a.balance, 0);
   const totalFin = DB.finances.filter(f => f.status === 'ACTIVE' || f.status === 'APPROVED').reduce((s, f) => s + f.remaining, 0);
-  let html = `<div class="gui-grid3" style="margin-bottom:12px">
-    <div class="stat-box"><div class="lbl">${isEn()?'Total assets':'สินทรัพย์รวม'}</div><div class="val">${fmtMoney(totalAssets)}</div></div>
-    <div class="stat-box"><div class="lbl">${t('dash_finance')}</div><div class="val">${fmtMoney(totalFin)}</div></div>
-    <div class="stat-box"><div class="lbl">${t('dash_members')}</div><div class="val">${DB.members.length}</div></div>
-  </div>`;
-  html += `<div style="color:var(--zowe);margin:8px 0 4px">${isEn()?'By account type':'แยกตามประเภทบัญชี'}</div>`;
-  html += `<table class="gui-table"><tr><th>Type</th><th>Count</th><th>Balance</th></tr>
-    <tr><td>SAVINGS</td><td>${DB.accounts.filter(a=>a.type==='SAVINGS').length}</td><td>${fmtMoney(totalSav)}</td></tr>
-    <tr><td>SHARE</td><td>${DB.accounts.filter(a=>a.type==='SHARE').length}</td><td>${fmtMoney(totalShare)}</td></tr>
-    <tr><td>INVEST</td><td>${DB.accounts.filter(a=>a.type==='INVEST').length}</td><td>${fmtMoney(totalInv)}</td></tr>
-  </table>`;
-  html += `<div style="color:var(--zowe);margin:12px 0 4px">${isEn()?'Finance by product':'สินเชื่อแยกผลิตภัณฑ์'}</div>`;
-  html += '<table class="gui-table"><tr><th>Product</th><th>Count</th><th>Remaining</th></tr>';
-  Object.keys(PRODUCT_DESC).forEach(p => {
-    const list = DB.finances.filter(f => f.product === p);
-    if (list.length) {
-      const rem = list.reduce((s, f) => s + f.remaining, 0);
-      html += `<tr><td>${p}</td><td>${list.length}</td><td>${fmtMoney(rem)}</td></tr>`;
-    }
-  });
-  html += '</table>';
-  html += `<p style="color:var(--muted);margin-top:12px;font-size:11px">${t('sharia_note')}</p>`;
+  let html = `<div class="stat-box"><div class="lbl">${isEn()?'Total assets':'สินทรัพย์รวม'}</div><div class="val">${fmtMoney(totalAssets)} THB</div></div>`;
+  html += `<div class="stat-box"><div class="lbl">${t('dash_finance')}</div><div class="val">${fmtMoney(totalFin)} THB</div></div>`;
+  html += `<p style="color:var(--cyan-dim);margin-top:12px">${isEn()?'Summary for Islamic cooperative study & ops':'รายงานสรุปเบื้องต้นสำหรับการศึกษาและบริหารสหกรณ์อิสลาม'}</p>`;
   $('gui-report').innerHTML = html;
-}
-function guiShowSharia() {
-  if (!requireGuiLogin()) return;
-  const lines = isEn()
-    ? ['1. No Riba (interest)', '2. Profit & Loss Sharing (Mudarabah / Musharakah)', '3. Asset-backed transactions', '4. No excessive Gharar or Maysir', '5. Qard Hasan — interest-free benevolent loan', '6. Murabaha — cost-plus disclosed sale', '7. Ijarah — Islamic lease', '8. Wadiah savings — safekeeping']
-    : ['1. ห้าม Riba (ดอกเบี้ย)', '2. Profit & Loss Sharing (Mudarabah / Musharakah)', '3. ผูกกับสินทรัพย์จริง (Asset-backed)', '4. ห้าม Gharar / Maysir เกินควร', '5. Qard Hasan — กู้ดีไม่มีดอก', '6. Murabaha — ขายผ่อนเปิดเผยต้นทุน+กำไร', '7. Ijarah — เช่า / เช่าซื้อ', '8. Wadiah — ออมแบบรักษาทรัพย์'];
-  let html = `<div class="stat-box"><div class="lbl">SHARIA</div><div class="val" style="font-size:14px">${isEn()?'Principles':'หลักการชารีอะฮ์'}</div></div>`;
-  html += '<ul style="margin:12px 0 0 18px;line-height:1.7;color:var(--text)">';
-  lines.forEach(l => { html += `<li>${l}</li>`; });
-  html += '</ul>';
-  html += `<p style="color:var(--warn);margin-top:12px;font-size:11px">${isEn()?'For study/ops — real use needs a Sharia Board.':'เพื่อการศึกษา/บริหาร — ใช้งานจริงควรมี Sharia Board กำกับ'}</p>`;
-  $('gui-report').innerHTML = html;
-  print(isEn() ? '[GUI] SHARIA principles shown' : '[GUI] แสดงหลักชารีอะฮ์', 'system');
-}
-function guiShowStatus() {
-  if (!requireGuiLogin()) return;
-  guiRefreshReport();
-  print(isEn() ? '[GUI] STATUS / REPORT refreshed' : '[GUI] รีเฟรช STATUS / REPORT', 'system');
 }
 
-// ── GUI Auth ─────────────────────────────────────────────
+
+function refreshGuiSettings() {
+  const s = DB.settings || {};
+  if ($('set-name')) $('set-name').value = s.coopName || '';
+  if ($('set-branch')) $('set-branch').value = s.branch || '';
+  if ($('set-phone')) $('set-phone').value = s.phone || '';
+  if ($('set-address')) $('set-address').value = s.address || '';
+  if ($('set-email')) $('set-email').value = s.email || '';
+}
+function guiSaveSettings() {
+  if (!requireGuiWrite()) return;
+  DB.settings.coopName = ($('set-name')?.value || '').trim() || DB.settings.coopName;
+  DB.settings.branch = ($('set-branch')?.value || '').trim();
+  DB.settings.phone = ($('set-phone')?.value || '').trim();
+  DB.settings.address = ($('set-address')?.value || '').trim();
+  DB.settings.email = ($('set-email')?.value || '').trim();
+  saveDB();
+  audit('SETTINGS', 'GUI');
+  const msg = $('set-msg');
+  if (msg) msg.textContent = isEn() ? '✓ Saved — will appear on slips' : '✓ บันทึกแล้ว — แสดงบนสลิป';
+  print(isEn() ? '✓ Settings saved' : '✓ บันทึกตั้งค่าสถาบันแล้ว', 'ok');
+}
+function guiGoTab(name) {
+  const tab = document.querySelector('.gui-tab[data-tab="' + name + '"]');
+  if (tab) tab.click();
+}
+
+// ── GUI Auth + User management ───────────────────────────
+let editingUsername = null;
+
 function refreshGuiAuth() {
   const box = $('auth-session-val');
   if (box) {
@@ -2659,12 +3483,31 @@ function refreshGuiAuth() {
       box.style.color = 'var(--amber)';
     }
   }
+  const isAdmin = !!(sessionUser && sessionUser.role === 'ADMIN');
+  const form = $('auth-user-form');
+  if (form) {
+    form.style.opacity = isAdmin ? '1' : '0.5';
+    form.style.pointerEvents = isAdmin ? 'auto' : 'none';
+  }
+  const adminHint = $('auth-admin-hint');
+  if (adminHint) {
+    adminHint.textContent = isAdmin
+      ? (isEn() ? 'ADMIN: add, edit role/name, reset password, delete users' : 'ADMIN: เพิ่ม แก้สิทธิ์/ชื่อ รีเซ็ตรหัส ลบ user')
+      : (isEn() ? 'Login as ADMIN to manage users' : 'LOGIN เป็น ADMIN เพื่อจัดการ user');
+  }
   const list = $('auth-users-list');
   if (list) {
     let html = `<div class="gui-label" style="margin-bottom:6px">${isEn() ? 'OPS users' : 'ผู้ใช้ OPS'}</div>`;
-    html += '<table class="gui-table"><tr><th>User</th><th>Role</th><th>Name</th></tr>';
+    html += `<table class="gui-table"><tr><th>User</th><th>Role</th><th>Name</th><th></th></tr>`;
     (DB.users || []).forEach(u => {
-      html += `<tr><td>${u.username}</td><td>${u.role}</td><td>${u.name || ''}</td></tr>`;
+      const un = escapeHtml(u.username);
+      let acts = '';
+      if (isAdmin) {
+        acts = `<button class="gui-btn-sm" onclick="guiUserEdit('${un}')">${isEn() ? 'Edit' : 'แก้ไข'}</button>
+          <button class="gui-btn-sm" onclick="guiUserPickPass('${un}')">${isEn() ? 'Pass' : 'รหัส'}</button>
+          <button class="gui-btn-sm gui-btn-danger" onclick="guiUserDelete('${un}')">${isEn() ? 'Del' : 'ลบ'}</button>`;
+      }
+      html += `<tr><td>${un}</td><td>${escapeHtml(u.role)}</td><td>${escapeHtml(u.name || '')}</td><td>${acts}</td></tr>`;
     });
     html += '</table>';
     list.innerHTML = html;
@@ -2676,6 +3519,184 @@ function refreshGuiAuth() {
       : 'ตัวอย่าง: admin / admin123 · teller / teller123 · viewer / view123';
   }
 }
+
+function guiUserClearForm() {
+  editingUsername = null;
+  if ($('u-username')) { $('u-username').value = ''; $('u-username').disabled = false; }
+  if ($('u-name')) $('u-name').value = '';
+  if ($('u-pass')) $('u-pass').value = '';
+  if ($('u-role')) $('u-role').value = 'TELLER';
+  if ($('btn-u-save')) $('btn-u-save').style.display = 'none';
+  if ($('btn-u-cancel')) $('btn-u-cancel').style.display = 'none';
+}
+
+function guiUserEdit(username) {
+  if (!sessionUser || sessionUser.role !== 'ADMIN') {
+    alert(isEn() ? 'ADMIN only' : 'เฉพาะ ADMIN');
+    return;
+  }
+  const u = DB.users.find(x => x.username === username);
+  if (!u) return;
+  editingUsername = username;
+  $('u-username').value = u.username;
+  $('u-username').disabled = true;
+  $('u-name').value = u.name || '';
+  $('u-role').value = u.role || 'TELLER';
+  $('u-pass').value = '';
+  $('btn-u-save').style.display = '';
+  $('btn-u-cancel').style.display = '';
+}
+
+function guiUserCancelEdit() {
+  guiUserClearForm();
+}
+
+function guiUserPickPass(username) {
+  if (!sessionUser || sessionUser.role !== 'ADMIN') {
+    alert(isEn() ? 'ADMIN only' : 'เฉพาะ ADMIN');
+    return;
+  }
+  const u = DB.users.find(x => x.username === username);
+  if (!u) return;
+  $('u-username').value = u.username;
+  $('u-username').disabled = true;
+  $('u-name').value = u.name || '';
+  $('u-role').value = u.role || 'TELLER';
+  $('u-pass').value = '';
+  $('u-pass').focus();
+  editingUsername = null;
+  $('btn-u-save').style.display = 'none';
+  $('btn-u-cancel').style.display = '';
+  alert(isEn()
+    ? 'Enter new password below, then click Reset password'
+    : 'ใส่รหัสใหม่ในช่อง Password แล้วกด Reset password');
+}
+
+async function guiUserAdd() {
+  if (!sessionUser || sessionUser.role !== 'ADMIN') {
+    alert(isEn() ? 'ADMIN only' : 'เฉพาะ ADMIN');
+    return;
+  }
+  const username = ($('u-username')?.value || '').trim();
+  const password = ($('u-pass')?.value || '').trim();
+  const role = ($('u-role')?.value || 'TELLER').toUpperCase();
+  const name = ($('u-name')?.value || '').trim() || username;
+  if (!username || !password) {
+    alert(isEn() ? 'Username and password required' : 'ต้องมีชื่อผู้ใช้และรหัสผ่าน');
+    return;
+  }
+  if (password.length < 6) {
+    alert(isEn() ? 'Password min 6 characters' : 'รหัสผ่านอย่างน้อย 6 ตัว');
+    return;
+  }
+  if (DB.users.some(u => u.username === username)) {
+    alert(isEn() ? 'Username exists' : 'ชื่อผู้ใช้ซ้ำ');
+    return;
+  }
+  const u = { id: 'U' + String(DB.users.length + 1).padStart(3, '0'), username, role, name };
+  await setUserPassword(u, password);
+  DB.users.push(u);
+  saveDB();
+  audit('USER_ADD', username + ' GUI');
+  guiUserClearForm();
+  refreshGuiAuth();
+  print(`✓ [GUI] User ${username} (${role}) added`, 'ok');
+}
+
+async function guiUserSaveEdit() {
+  if (!sessionUser || sessionUser.role !== 'ADMIN') {
+    alert(isEn() ? 'ADMIN only' : 'เฉพาะ ADMIN');
+    return;
+  }
+  if (!editingUsername) return;
+  const u = DB.users.find(x => x.username === editingUsername);
+  if (!u) return;
+  const role = ($('u-role')?.value || u.role).toUpperCase();
+  const name = ($('u-name')?.value || '').trim();
+  if (!['ADMIN', 'TELLER', 'VIEW'].includes(role)) {
+    alert('Role: ADMIN | TELLER | VIEW');
+    return;
+  }
+  if (u.username === 'admin' && role !== 'ADMIN') {
+    alert(isEn() ? 'Cannot demote built-in admin' : 'ลดสิทธิ์ admin หลักไม่ได้');
+    return;
+  }
+  u.role = role;
+  if (name) u.name = name;
+  saveDB();
+  audit('USER_EDIT', u.username + ' GUI');
+  if (sessionUser.username === u.username) {
+    sessionUser.role = u.role;
+    sessionUser.name = u.name;
+    $('mode-display').textContent = u.role;
+  }
+  guiUserClearForm();
+  refreshGuiAuth();
+  print(`✓ [GUI] User ${u.username} updated`, 'ok');
+}
+
+async function guiUserResetPass() {
+  if (!sessionUser || sessionUser.role !== 'ADMIN') {
+    alert(isEn() ? 'ADMIN only' : 'เฉพาะ ADMIN');
+    return;
+  }
+  const username = ($('u-username')?.value || '').trim();
+  const password = ($('u-pass')?.value || '').trim();
+  if (!username || !password) {
+    alert(isEn() ? 'Select user and enter new password' : 'เลือก user แล้วใส่รหัสใหม่');
+    return;
+  }
+  if (password.length < 6) {
+    alert(isEn() ? 'Password min 6 characters' : 'รหัสผ่านอย่างน้อย 6 ตัว');
+    return;
+  }
+  const u = DB.users.find(x => x.username === username);
+  if (!u) {
+    alert(isEn() ? 'User not found' : 'ไม่พบผู้ใช้');
+    return;
+  }
+  await setUserPassword(u, password);
+  saveDB();
+  audit('USER_PASS', username + ' GUI');
+  guiUserClearForm();
+  refreshGuiAuth();
+  print(`✓ [GUI] Password reset for ${username}`, 'ok');
+}
+
+function guiUserDelete(username) {
+  if (!sessionUser || sessionUser.role !== 'ADMIN') {
+    alert(isEn() ? 'ADMIN only' : 'เฉพาะ ADMIN');
+    return;
+  }
+  if (username === 'admin') {
+    alert(isEn() ? 'Cannot delete built-in admin' : 'ลบ admin หลักไม่ได้');
+    return;
+  }
+  if (sessionUser.username === username) {
+    alert(isEn() ? 'Cannot delete current session user' : 'ลบผู้ใช้ที่ login อยู่ไม่ได้');
+    return;
+  }
+  if (!confirm(isEn() ? 'Delete user ' + username + '?' : 'ลบ user ' + username + '?')) return;
+  const idx = DB.users.findIndex(x => x.username === username);
+  if (idx < 0) return;
+  DB.users.splice(idx, 1);
+  saveDB();
+  audit('USER_DEL', username + ' GUI');
+  guiUserClearForm();
+  refreshGuiAuth();
+  print(`✓ [GUI] User ${username} deleted`, 'ok');
+}
+
+// Enter-to-login on AUTH fields
+(function setupAuthEnter() {
+  ['auth-user', 'auth-pass'].forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.addEventListener('keydown', e => {
+      if (e.key === 'Enter') { e.preventDefault(); guiLogin(); }
+    });
+  });
+})();
 
 async function guiLogin() {
   const user = ($('auth-user')?.value || '').trim();
@@ -2699,11 +3720,6 @@ async function guiLogin() {
   $('mode-display').textContent = u.role;
   if ($('auth-pass')) $('auth-pass').value = '';
   refreshGuiAuth();
-  refreshDash();
-  refreshGuiMembers();
-  refreshGuiAccounts();
-  refreshGuiFinance();
-  refreshGuiTx();
   print(`✓ [GUI] LOGIN ${u.username} · role ${u.role}`, 'ok');
   audit('LOGIN', u.username + ' (GUI)');
 }
@@ -2715,155 +3731,6 @@ function guiLogout() {
   refreshGuiAuth();
   print('✓ [GUI] Logged out', 'ok');
   audit('LOGOUT', who + ' (GUI)');
-}
-function guiWho() {
-  if (!sessionUser) {
-    alert('GUEST (not logged in)');
-    print('GUEST (not logged in)', 'warn');
-  } else {
-    const msg = `${sessionUser.username} · ${sessionUser.role} · ${sessionUser.name || ''}`;
-    alert(msg);
-    print(msg, 'ok');
-  }
-}
-async function guiUserAdd() {
-  if (!sessionUser || sessionUser.role !== 'ADMIN') {
-    alert(t('role_denied') + ' (ADMIN only)');
-    return;
-  }
-  const username = ($('auth-new-user')?.value || '').trim();
-  const password = ($('auth-new-pass')?.value || '').trim();
-  const role = ($('auth-new-role')?.value || 'TELLER').toUpperCase();
-  if (!username || !password) { alert('USER ADD <user> <pass>'); return; }
-  if (password.length < 6) { alert(isEn() ? 'Password min 6 chars' : 'รหัสผ่านอย่างน้อย 6 ตัว'); return; }
-  if (!['ADMIN','TELLER','VIEW'].includes(role)) { alert('Role: ADMIN|TELLER|VIEW'); return; }
-  if (DB.users.some(u => u.username === username)) { alert('Username exists'); return; }
-  const u = { id: 'U' + String(DB.users.length + 1).padStart(3, '0'), username, role, name: username };
-  await setUserPassword(u, password);
-  DB.users.push(u);
-  saveDB();
-  audit('USER_ADD', `${username} ${role}`);
-  if ($('auth-new-user')) $('auth-new-user').value = '';
-  if ($('auth-new-pass')) $('auth-new-pass').value = '';
-  refreshGuiAuth();
-  print(`✓ [GUI] User ${username} (${role}) added`, 'ok');
-}
-async function guiUserPass() {
-  if (!sessionUser || sessionUser.role !== 'ADMIN') {
-    alert(t('role_denied') + ' (ADMIN only)');
-    return;
-  }
-  const username = ($('auth-new-user')?.value || '').trim();
-  const password = ($('auth-new-pass')?.value || '').trim();
-  if (!username || !password) { alert('USER PASS: fill username + new password'); return; }
-  if (password.length < 6) { alert(isEn() ? 'Password min 6 chars' : 'รหัสผ่านอย่างน้อย 6 ตัว'); return; }
-  const u = DB.users.find(x => x.username === username);
-  if (!u) { alert(isEn() ? 'User not found' : 'ไม่พบผู้ใช้'); return; }
-  await setUserPassword(u, password);
-  saveDB();
-  audit('USER_PASS', username);
-  if ($('auth-new-pass')) $('auth-new-pass').value = '';
-  refreshGuiAuth();
-  print(`✓ [GUI] Password updated for ${username}`, 'ok');
-}
-function guiUserDel() {
-  if (!sessionUser || sessionUser.role !== 'ADMIN') {
-    alert(t('role_denied') + ' (ADMIN only)');
-    return;
-  }
-  const username = ($('auth-new-user')?.value || '').trim();
-  if (!username) { alert('USER DEL: fill username'); return; }
-  if (username === 'admin') { alert(isEn() ? 'Cannot delete built-in admin' : 'ลบ admin หลักไม่ได้'); return; }
-  if (sessionUser.username === username) { alert(isEn() ? 'Cannot delete current session user' : 'ลบผู้ใช้ที่ login อยู่ไม่ได้'); return; }
-  const idx = DB.users.findIndex(x => x.username === username);
-  if (idx < 0) { alert(isEn() ? 'User not found' : 'ไม่พบผู้ใช้'); return; }
-  if (!confirm(isEn() ? `Delete user ${username}?` : `ลบผู้ใช้ ${username}?`)) return;
-  DB.users.splice(idx, 1);
-  saveDB();
-  audit('USER_DEL', username);
-  refreshGuiAuth();
-  print(`✓ [GUI] User ${username} deleted`, 'ok');
-}
-
-// ── GUI Tools (SEED / EXPORT / RESET / MODE / AUDIT) ─────
-function guiToolsRefresh() {
-  const out = $('gui-tools-out');
-  if (!out) return;
-  const mode = isVaultOnly() ? 'VAULT-ONLY' : 'LOCAL';
-  out.textContent = (isEn()
-    ? `Storage: ${mode} · Members ${DB.members.length} · Accounts ${DB.accounts.length} · Finance ${DB.finances.length} · Tx ${DB.transactions.length}`
-    : `โหมดเก็บ: ${mode} · สมาชิก ${DB.members.length} · บัญชี ${DB.accounts.length} · สินเชื่อ ${DB.finances.length} · รายการ ${DB.transactions.length}`);
-  const hint = $('tools-mode-hint');
-  if (hint) {
-    hint.textContent = isVaultOnly()
-      ? (isEn() ? 'Current: VAULT-ONLY (no localStorage)' : 'ปัจจุบัน: VAULT-ONLY (ไม่เขียน localStorage)')
-      : (isEn() ? 'Current: LOCAL (localStorage enabled)' : 'ปัจจุบัน: LOCAL (ใช้ localStorage)');
-  }
-}
-function guiSeed(force) {
-  if (!requireGuiWrite()) return;
-  if (DB.members.length > 0 && !force) {
-    alert(isEn() ? 'Data exists — use SEED FORCE to overwrite' : 'มีข้อมูลอยู่แล้ว — ใช้ SEED FORCE เพื่อทับ');
-    return;
-  }
-  if (force && !confirm(isEn() ? 'Overwrite all sample data?' : 'ทับข้อมูลตัวอย่างทั้งหมด?')) return;
-  runCommand(force ? 'SEED FORCE' : 'SEED');
-  refreshDash();
-  refreshGuiMembers();
-  refreshGuiAccounts();
-  refreshGuiFinance();
-  refreshGuiTx();
-  guiToolsRefresh();
-}
-function guiExport() {
-  if (!requireGuiLogin()) return;
-  runCommand('EXPORT');
-  const out = $('gui-tools-out');
-  if (out) out.textContent = isEn() ? '✓ EXPORT JSON started (download)' : '✓ ส่งออก JSON แล้ว (ดาวน์โหลด)';
-}
-function guiReset() {
-  if (!sessionUser || sessionUser.role !== 'ADMIN') {
-    alert(t('role_denied') + ' (ADMIN only)');
-    return;
-  }
-  if (!confirm(isEn() ? 'RESET CONFIRM — erase ALL data?' : 'RESET CONFIRM — ล้างข้อมูลทั้งหมด?')) return;
-  runCommand('RESET CONFIRM');
-  refreshDash();
-  refreshGuiMembers();
-  refreshGuiAccounts();
-  refreshGuiFinance();
-  refreshGuiTx();
-  guiToolsRefresh();
-  const out = $('gui-tools-out');
-  if (out) out.textContent = isEn() ? '✓ All data cleared' : '✓ ล้างข้อมูลทั้งหมดแล้ว';
-}
-function guiMode(sub) {
-  if (sub === 'STATUS') {
-    runCommand('MODE STATUS');
-    guiToolsRefresh();
-    return;
-  }
-  if (!sessionUser || sessionUser.role !== 'ADMIN') {
-    alert(t('role_denied') + ' (ADMIN only)');
-    return;
-  }
-  runCommand('MODE ' + sub);
-  guiToolsRefresh();
-}
-function guiAudit(n) {
-  if (!requireGuiLogin()) return;
-  runCommand('AUDIT ' + (n || 30));
-  const rows = (DB.audit || []).slice(-(n || 30)).reverse();
-  const out = $('gui-tools-out');
-  if (!out) return;
-  if (!rows.length) {
-    out.textContent = isEn() ? '(audit empty)' : '(ยังไม่มี audit)';
-    return;
-  }
-  out.textContent = rows.map(r => {
-    const t0 = (r.ts || '').replace('T', ' ').slice(0, 19);
-    return `${t0}  ${(r.user||'').padEnd(10)} ${(r.role||'-').padEnd(6)} ${(r.action||'').padEnd(12)} ${r.detail||''}`;
-  }).join('\n');
 }
 
 // ── GUI Vault ────────────────────────────────────────────

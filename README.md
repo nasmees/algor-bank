@@ -106,6 +106,34 @@ MIT — use, study, and adapt freely. Attribution appreciated.
 
 ---
 
+### Added in the latest version (EN)
+
+Extra capabilities on top of the core list above:
+
+| Area | What was added |
+|------|----------------|
+| **Delete / update** | `MEMBER DEL` · `ACCOUNT CLOSE/EDIT/DEL` · `FINANCE EDIT/DEL` (CLI + GUI) |
+| **Finance detail** | Purpose text · installment schedule · pay history · `FINANCE SCHEDULE` |
+| **5C score** | `5C <memberId>` · panel tab (Character · Capacity · Capital · Collateral · Condition) |
+| **PDF slips** | Half-A4 portrait · **PRINT** + **download PDF** (deposit, withdraw, open account, finance pay) |
+| **Institution** | `SETTINGS name=… address=… phone=… email=… branch=…` on every slip |
+| **OPS users** | `USER EDIT` / `USER PASS` / `USER DEL` · GUI Auth management · PBKDF2 password hashes |
+| **Vault mode** | Native save dialog · `MODE VAULT` (no localStorage) · `MODE LOCAL` |
+| **Audit** | `AUDIT` — who did what |
+| **Panel (F7)** | Settings · 5C · user admin · colored action buttons · login required for data tabs |
+
+Example (new):
+
+```text
+FINANCE APPLY M001 MURABAHA 50000 12 5 ซื้อมอเตอร์ไซค์รับจ้าง
+FINANCE SCHEDULE F001
+5C M001
+SETTINGS name=My Coop phone=08x-xxx-xxxx
+USER PASS teller NewPass99
+```
+
+---
+
 ## ภาษาไทย
 
 ### algor-bank คืออะไร?
@@ -196,6 +224,34 @@ VAULT SAVE
 ### สัญญาอนุญาต
 
 MIT — ใช้ ศึกษา และดัดแปลงได้อย่างอิสระ
+
+---
+
+### เพิ่มเติมในเวอร์ชันล่าสุด (TH)
+
+ส่วนนี้**เพิ่มจากของเดิม** ไม่ได้ลบรายการข้างบน:
+
+| หัวข้อ | สิ่งที่เพิ่ม |
+|--------|-------------|
+| **ลบ / แก้ไข** | `MEMBER DEL` · `ACCOUNT CLOSE/EDIT/DEL` · `FINANCE EDIT/DEL` (CLI + GUI) |
+| **รายละเอียดสินเชื่อ** | วัตถุประสงค์ · ตารางงวด · ประวัติชำระ · `FINANCE SCHEDULE` |
+| **ประเมิน 5C** | `5C <รหัสสมาชิก>` · แท็บ 5C ใน Panel |
+| **สลิป PDF** | ครึ่ง A4 · **PRINT** + **ดาวน์โหลด PDF** |
+| **สถาบัน** | `SETTINGS name=… phone=…` ขึ้นหัวสลิป |
+| **User OPS** | `USER EDIT/PASS/DEL` · จัดการในแท็บ AUTH · รหัสแบบ hash |
+| **Vault** | หน้าต่างบันทึก · `MODE VAULT` / `MODE LOCAL` |
+| **Audit** | `AUDIT` — ใครทำอะไร |
+| **Panel (F7)** | ตั้งค่า · 5C · จัดการ user · ปุ่มสี · ต้อง LOGIN ก่อนดูข้อมูล |
+
+ตัวอย่างคำสั่งใหม่:
+
+```text
+FINANCE APPLY M001 MURABAHA 50000 12 5 ซื้อมอเตอร์ไซค์รับจ้าง
+FINANCE SCHEDULE F001
+5C M001
+SETTINGS name=สหกรณ์ตัวอย่าง phone=073-xxx-xxx
+USER PASS teller รหัสใหม่99
+```
 
 ---
 
